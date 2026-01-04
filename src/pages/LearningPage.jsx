@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import mermaid from "mermaid";
 import MDEditor from "@uiw/react-md-editor";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../components/theme-provider";
 import '../markdown.css'
+import { CURRICULUM_DATA } from "../data/curriculum";
 // ------------------------------------------------------------------
 // 1. DATA & UTILS
 // ------------------------------------------------------------------
@@ -45,6 +47,7 @@ const slugify = (text) => {
     .replace(/\-\-+/g, "-");
 };
 
+// Helper to extract raw text from React children (Fixes the [object Object] error)
 const getNodeText = (node) => {
   if (["string", "number"].includes(typeof node)) return node;
   if (node instanceof Array) return node.map(getNodeText).join("");
@@ -53,164 +56,77 @@ const getNodeText = (node) => {
   return "";
 };
 
-// --- MOCK DATA ---
- const CURRICULUM_DATA = [
-  {
-    id: "track-react-core",
-    title: "React Internals & Architecture",
-    description: "A comprehensive text-based analysis of the React reconciliation algorithm, fiber architecture, and concurrent rendering features.",
-    icon: Code2,
-    level: "Advanced",
-    totalDuration: "12h 45m",
-    modules: [
-      {
-        id: "mod-rec-algo",
-        title: "The Reconciliation Algorithm",
-        duration: "45m",
-        lessons: [
-          { 
-            id: "les-vdom-real", 
-            title: "Virtual DOM vs Real DOM: Memory Allocation", 
-            duration: "10 min read", 
-            type: "concept",
-            content: `
-# Virtual DOM vs Real DOM
 
-React creates a tree of custom objects ("virtual DOM") in memory.
 
-## Why Virtual DOM?
-Manipulating the DOM is slow. Updating the virtual DOM is fast.
+const Mermaid = ({ chart }) => {
+  const { theme } = useTheme?.() ?? { theme: "system" };
 
-\`\`\`javascript
-const element = {
-  type: 'h1',
-  props: {
-    className: 'greeting',
-    children: 'Hello, world!'
-  }
-};
-\`\`\`
-            `
-          },
-          { 
-            id: "les-diff-algo", 
-            title: "The Heuristic O(n) Diffing Algorithm", 
-            duration: "15 min read", 
-            type: "documentation",
-            content: "# Diffing Algorithm\n\nReact implements a heuristic O(n) algorithm..." 
-          },
-          { 
-            id: "les-keys-render", 
-            title: "Keys and List Rendering Performance", 
-            duration: "12 min read", 
-            type: "guide",
-            content: "# Keys\n\nKeys help React identify which items have changed..." 
-          },
-          { 
-            id: "les-batching", 
-            title: "Automatic Batching in React 18", 
-            duration: "8 min read", 
-            type: "concept",
-            content: "# Automatic Batching\n\nReact 18 batches state updates..." 
-          },
-        ]
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const ref = useRef(null);
+  const [svg, setSvg] = useState("");
+
+  useEffect(() => {
+    if (!chart) return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? "dark" : "default",
+      securityLevel: "loose",
+      fontFamily: "ui-sans-serif, system-ui, sans-serif",
+      themeVariables: {
+        background: isDark ? "#000000" : "#ffffff",
+        primaryColor: isDark ? "#27272a" : "#fff",
+        primaryBorderColor: isDark ? "#3f3f46" : "#d4d4d8",
+        primaryTextColor: isDark ? "#ffffff" : "#fff",
+        lineColor: isDark ? "#71717a" : "#a1a1aa",
       },
-      {
-        id: "mod-fiber-arch",
-        title: "React Fiber Architecture",
-        duration: "2h 10m",
-        lessons: [
-          { 
-            id: "les-fiber-node", 
-            title: "Anatomy of a Fiber Node", 
-            duration: "18 min read", 
-            type: "documentation",
-            content: "# Fiber Node\n\nA Fiber is a JavaScript object that contains information about a component..." 
-          },
-          { id: "les-work-loop", title: "The Work Loop & Scheduler Priority", duration: "25 min read", type: "architecture", content: "# Work Loop\n\n..." },
-          { id: "les-phases", title: "Render Phase vs Commit Phase", duration: "20 min read", type: "concept", content: "# Phases\n\n..." },
-          { id: "les-time-slice", title: "Time Slicing & Interruptible Rendering", duration: "30 min read", type: "guide", content: "# Time Slicing\n\n..." },
-        ]
-      },
-      {
-        id: "mod-concurrent",
-        title: "Concurrent Features",
-        duration: "3h 00m",
-        lessons: [
-          { id: "les-use-trans", title: "useTransition: Non-blocking Updates", duration: "20 min read", type: "documentation", content: "# useTransition\n\n..." },
-          { id: "les-use-defer", title: "useDeferredValue Implementation Details", duration: "15 min read", type: "guide", content: "# useDeferredValue\n\n..." },
-          { id: "les-suspense", title: "Suspense Boundaries & Fallback UI", duration: "45 min read", type: "architecture", content: "# Suspense\n\n..." },
-          { id: "les-streaming", title: "Streaming Server Rendering (SSR)", duration: "50 min read", type: "guide", content: "# SSR Streaming\n\n..." },
-        ]
-      },
-      {
-        id: "mod-state-mgmt",
-        title: "State Management Patterns",
-        duration: "2h 30m",
-        lessons: [
-          { id: "les-context-perf", title: "Context API Performance Pitfalls", duration: "25 min read", type: "guide", content: "# Context API\n\n..." },
-          { id: "les-zustand", title: "Atomic State with Zustand", duration: "20 min read", type: "documentation", content: "# Zustand\n\n..." },
-          { id: "les-server-state", title: "Server State vs Client State", duration: "15 min read", type: "concept", content: "# Server State\n\n..." },
-        ]
+    });
+
+    const renderChart = async () => {
+      try {
+        const id = `mermaid-${Math.random().toString(36).slice(2)}`;
+        const { svg } = await mermaid.render(id, chart);
+        setSvg(svg);
+      } catch (error) {
+        console.error("Mermaid error:", error);
+        setSvg(`
+          <pre class="
+            text-xs p-3 rounded-lg border
+            text-red-600 bg-red-50 border-red-200
+            dark:text-red-400 dark:bg-red-950/30 dark:border-red-900
+          ">
+${error.message}
+          </pre>
+        `);
       }
-    ]
-  },
-  // ... (Other tracks would follow the same structure with 'content' added)
-  {
-    id: "track-comp-patterns",
-    title: "Advanced Component Patterns",
-    description: "Design scalable, headless component libraries using composition, compound components, and advanced props patterns.",
-    icon: Layout,
-    level: "Intermediate",
-    totalDuration: "8h 30m",
-    modules: [
-        {
-            id: "mod-composition",
-            title: "Composition Patterns",
-            duration: "1h 30m",
-            lessons: [
-              { id: "les-containment", title: "Containment vs Specialization", duration: "15 min read", type: "concept", content: "# Containment\n\n..." },
-            ]
-        }
-    ]
-  },
-  {
-    id: "track-native-prod",
-    title: "React Native Production",
-    description: "Building high-performance mobile applications. Bridge architecture, JSI, and native modules.",
-    icon: Smartphone,
-    level: "Expert",
-    totalDuration: "15h 00m",
-    modules: [
-        {
-            id: "mod-bridge",
-            title: "The Native Bridge",
-            duration: "1h 45m",
-            lessons: [
-              { id: "les-threads", title: "JS Thread vs UI Thread Architecture", duration: "20 min read", type: "architecture", content: "# Threads\n\n..." },
-            ]
-        }
-    ]
-  },
-  {
-    id: "track-edge-eng",
-    title: "Edge & Server Engineering",
-    description: "Backend-for-frontend patterns. Next.js App Router, Edge Functions, and Distributed Databases.",
-    icon: Server,
-    level: "Expert",
-    totalDuration: "10h 15m",
-    modules: [
-        {
-            id: "mod-runtimes",
-            title: "Runtime Environments",
-            duration: "1h 15m",
-            lessons: [
-                { id: "les-node-edge", title: "Node.js vs Edge Runtime Differences", duration: "20 min read", type: "concept", content: "# Runtimes\n\n..." },
-            ]
-        }
-    ]
-  }
-];
+    };
+
+    renderChart();
+  }, [chart, isDark]);
+
+  return (
+    <div
+      ref={ref}
+      className="
+        my-6 flex justify-center overflow-x-auto rounded-xl border p-6
+
+        bg-white border-zinc-200
+        dark:bg-black dark:border-zinc-800
+      "
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
+};
+
+
+
+
+
 
 // ------------------------------------------------------------------
 // 2. STYLES (Custom Markdown Theme)
@@ -344,6 +260,8 @@ const CompletionModal = ({ isOpen, onClose, lessonTitle }) => (
     )}
   </AnimatePresence>
 );
+
+
 
 
 // --- Table of Contents (Fixed Right Sidebar) ---
@@ -545,7 +463,7 @@ const LessonSidebar = ({
       </div>
 
       {/* ================= SCROLLABLE CONTENT ================= */}
-      <ScrollArea className="flex-1 pb-10 min-h-0">
+      <ScrollArea className="flex-1 pb-20 min-h-0">
         <div className="px-4 py-6 space-y-8">
           {activeTrack.modules.map((module, idx) => (
             <div key={module.id}>
@@ -886,6 +804,19 @@ export default function LearningPage() {
                     <div data-color-mode={isDark ? "dark" : "light"} className="prose  prose-invert max-w-none">
                         <MDEditor.Markdown 
                            source={activeLesson.content}
+                         components={{
+                              
+                              // FIX: Extract text from children properly for code blocks
+                              code: ({ inline, children, className, ...props }) => {
+                                const match = /language-(\w+)/.exec(className || "");
+                                const codeContent = getNodeText(children); // Use helper here
+                                
+                                if (!inline && match && match[1] === "mermaid") {
+                                  return <Mermaid chart={codeContent} />;
+                                }
+                                return <code className={className} {...props}>{children}</code>;
+                              }
+                            }}
                            
                             style={{ 
                                 backgroundColor: isDark ? "transparent" : "", 

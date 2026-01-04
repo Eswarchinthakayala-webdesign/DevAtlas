@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import mermaid from "mermaid";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,170 +37,16 @@ import {
   Flame,
   Menu,
   X,
-  PlayCircle
+  PlayCircle,
+ 
 } from "lucide-react";
+
+import { CURRICULUM_DATA } from "../data/curriculum";
 
 // ------------------------------------------------------------------
 // 1. DATA STORE (Enhanced with Markdown Content)
 // ------------------------------------------------------------------
 
-export const CURRICULUM_DATA = [
-  {
-    id: "track-react-core",
-    title: "React Internals & Architecture",
-    description: "A comprehensive text-based analysis of the React reconciliation algorithm, fiber architecture, and concurrent rendering features.",
-    icon: Code2,
-    level: "Advanced",
-    totalDuration: "12h 45m",
-    modules: [
-      {
-        id: "mod-rec-algo",
-        title: "The Reconciliation Algorithm",
-        duration: "45m",
-        lessons: [
-          { 
-            id: "les-vdom-real", 
-            title: "Virtual DOM vs Real DOM: Memory Allocation", 
-            duration: "10 min read", 
-            type: "concept",
-            content: `
-# Virtual DOM vs Real DOM
-
-React creates a tree of custom objects ("virtual DOM") in memory.
-
-## Why Virtual DOM?
-Manipulating the DOM is slow. Updating the virtual DOM is fast.
-
-\`\`\`javascript
-const element = {
-  type: 'h1',
-  props: {
-    className: 'greeting',
-    children: 'Hello, world!'
-  }
-};
-\`\`\`
-            `
-          },
-          { 
-            id: "les-diff-algo", 
-            title: "The Heuristic O(n) Diffing Algorithm", 
-            duration: "15 min read", 
-            type: "documentation",
-            content: "# Diffing Algorithm\n\nReact implements a heuristic O(n) algorithm..." 
-          },
-          { 
-            id: "les-keys-render", 
-            title: "Keys and List Rendering Performance", 
-            duration: "12 min read", 
-            type: "guide",
-            content: "# Keys\n\nKeys help React identify which items have changed..." 
-          },
-          { 
-            id: "les-batching", 
-            title: "Automatic Batching in React 18", 
-            duration: "8 min read", 
-            type: "concept",
-            content: "# Automatic Batching\n\nReact 18 batches state updates..." 
-          },
-        ]
-      },
-      {
-        id: "mod-fiber-arch",
-        title: "React Fiber Architecture",
-        duration: "2h 10m",
-        lessons: [
-          { 
-            id: "les-fiber-node", 
-            title: "Anatomy of a Fiber Node", 
-            duration: "18 min read", 
-            type: "documentation",
-            content: "# Fiber Node\n\nA Fiber is a JavaScript object that contains information about a component..." 
-          },
-          { id: "les-work-loop", title: "The Work Loop & Scheduler Priority", duration: "25 min read", type: "architecture", content: "# Work Loop\n\n..." },
-          { id: "les-phases", title: "Render Phase vs Commit Phase", duration: "20 min read", type: "concept", content: "# Phases\n\n..." },
-          { id: "les-time-slice", title: "Time Slicing & Interruptible Rendering", duration: "30 min read", type: "guide", content: "# Time Slicing\n\n..." },
-        ]
-      },
-      {
-        id: "mod-concurrent",
-        title: "Concurrent Features",
-        duration: "3h 00m",
-        lessons: [
-          { id: "les-use-trans", title: "useTransition: Non-blocking Updates", duration: "20 min read", type: "documentation", content: "# useTransition\n\n..." },
-          { id: "les-use-defer", title: "useDeferredValue Implementation Details", duration: "15 min read", type: "guide", content: "# useDeferredValue\n\n..." },
-          { id: "les-suspense", title: "Suspense Boundaries & Fallback UI", duration: "45 min read", type: "architecture", content: "# Suspense\n\n..." },
-          { id: "les-streaming", title: "Streaming Server Rendering (SSR)", duration: "50 min read", type: "guide", content: "# SSR Streaming\n\n..." },
-        ]
-      },
-      {
-        id: "mod-state-mgmt",
-        title: "State Management Patterns",
-        duration: "2h 30m",
-        lessons: [
-          { id: "les-context-perf", title: "Context API Performance Pitfalls", duration: "25 min read", type: "guide", content: "# Context API\n\n..." },
-          { id: "les-zustand", title: "Atomic State with Zustand", duration: "20 min read", type: "documentation", content: "# Zustand\n\n..." },
-          { id: "les-server-state", title: "Server State vs Client State", duration: "15 min read", type: "concept", content: "# Server State\n\n..." },
-        ]
-      }
-    ]
-  },
-  // ... (Other tracks would follow the same structure with 'content' added)
-  {
-    id: "track-comp-patterns",
-    title: "Advanced Component Patterns",
-    description: "Design scalable, headless component libraries using composition, compound components, and advanced props patterns.",
-    icon: Layout,
-    level: "Intermediate",
-    totalDuration: "8h 30m",
-    modules: [
-        {
-            id: "mod-composition",
-            title: "Composition Patterns",
-            duration: "1h 30m",
-            lessons: [
-              { id: "les-containment", title: "Containment vs Specialization", duration: "15 min read", type: "concept", content: "# Containment\n\n..." },
-            ]
-        }
-    ]
-  },
-  {
-    id: "track-native-prod",
-    title: "React Native Production",
-    description: "Building high-performance mobile applications. Bridge architecture, JSI, and native modules.",
-    icon: Smartphone,
-    level: "Expert",
-    totalDuration: "15h 00m",
-    modules: [
-        {
-            id: "mod-bridge",
-            title: "The Native Bridge",
-            duration: "1h 45m",
-            lessons: [
-              { id: "les-threads", title: "JS Thread vs UI Thread Architecture", duration: "20 min read", type: "architecture", content: "# Threads\n\n..." },
-            ]
-        }
-    ]
-  },
-  {
-    id: "track-edge-eng",
-    title: "Edge & Server Engineering",
-    description: "Backend-for-frontend patterns. Next.js App Router, Edge Functions, and Distributed Databases.",
-    icon: Server,
-    level: "Expert",
-    totalDuration: "10h 15m",
-    modules: [
-        {
-            id: "mod-runtimes",
-            title: "Runtime Environments",
-            duration: "1h 15m",
-            lessons: [
-                { id: "les-node-edge", title: "Node.js vs Edge Runtime Differences", duration: "20 min read", type: "concept", content: "# Runtimes\n\n..." },
-            ]
-        }
-    ]
-  }
-];
 
 // ------------------------------------------------------------------
 // 2. UTILITY HELPER: DATE FUNCTIONS
