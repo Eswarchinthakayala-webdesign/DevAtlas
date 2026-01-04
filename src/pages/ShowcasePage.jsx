@@ -31,85 +31,121 @@ import {
   MoreVertical,
   Cpu,
   Database,
-  Share2
+  Share2,
+  Eye,   // Added for Live Preview
+  Code,  // Added for Source Code
+  GitBranch // Added for Fork stats
 } from "lucide-react";
 
 // ------------------------------------------------------------------
-// 1. MOCK DATA: SHOWCASE PROJECTS
+// 1. MOCK DATA: SHOWCASE PROJECTS (Updated with Images & Links)
 // ------------------------------------------------------------------
 
 const SHOWCASE_DATA = [
   {
     id: "proj-1",
-    title: "Lumina Dashboard",
-    description: "A high-performance analytics dashboard handling 1M+ data points using React 18 Concurrent features and virtualization.",
-    author: "Sarah Chen",
-    role: "Senior Frontend Dev",
+    title: "Revolyx",
+    description: "Revolyx is a modern design and development platform offering tools for icons, flowcharts, backgrounds, QR codes, and more — all in one place.",
+    author: "Eswar Chinthakayala",
+    role: "Full Stack",
     category: "web",
-    tags: ["React 18", "D3.js", "Zustand"],
+    tags: ["React 18", "shadcnUI", "motion","three.js","etc"],
     stats: { stars: 128, forks: 34 },
     featured: true,
-    color: "from-purple-500 to-indigo-500"
+    color: "from-purple-500 to-indigo-500",
+    image: "/public/project-1.png",
+    liveUrl: "https://revolyx.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Revolyx"
   },
   {
     id: "proj-2",
-    title: "Apex Finance Mobile",
-    description: "Cross-platform fintech application built with React Native and Reanimated 3. Features 60fps charts and biometric auth.",
-    author: "James Wilson",
-    role: "Mobile Engineer",
-    category: "mobile",
-    tags: ["Expo", "Reanimated", "Skia"],
+    title: "VectorHue",
+    description: "An interactive learning portal for Engineering Mathematics II covering gradients, derivatives, tangent planes, and more — designed with clarity and real-time visuals.",
+    author: "Eswar Chinthakayala",
+    role: "Frontend Dev",
+    category: "web",
+    tags: ["React 18", "motion", "plot3d","three.js","etc"],
     stats: { stars: 89, forks: 12 },
     featured: false,
-    color: "from-zinc-500 to-teal-500"
+    color: "from-zinc-500 to-teal-500",
+    image: "/public/project-2.png",
+    liveUrl: "https://vectorhue.vercel.app",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/VectorHue"
   },
   {
     id: "proj-3",
-    title: "EdgeDB Scale",
-    description: "Distributed database layer deployed on Cloudflare Workers. Implements custom caching strategies and connection pooling.",
-    author: "Alex K.",
-    role: "Systems Architect",
-    category: "systems",
-    tags: ["Workers", "Rust", "Redis"],
+    title: "Numexis",
+    description: "Explore convergence, optimization, PDE relaxation, eigenvectors, and root finding — brought to life with custom Three.js animations.",
+    author: "Eswar Chinthakayala",
+    role: "Frontend Dev",
+    category: "web",
+    tags: ["React 18", "ShadcnUI", "motion","Recharts","three.js","plot3d","etc"],
     stats: { stars: 245, forks: 67 },
     featured: false,
-    color: "from-orange-500 to-red-500"
+    color: "from-orange-500 to-red-500",
+   image: "/public/project-3.png",
+    liveUrl: "https://numexis.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Numexis"
   },
   {
     id: "proj-4",
-    title: "Untitled UI Kit",
-    description: "A headless, accessible component library based on Radix Primitives. Fully typed and themed.",
-    author: "Maria Garcia",
-    role: "UI Engineer",
+    title: "TaskAraa",
+    description: "The ultimate productivity companion to manage your tasks, boost your focus, and elevate your daily habits. Perfect for creators, teams, and anyone striving for personal growth.",
+    author: "Eswar Chinthakayala",
+    role: "Full Stack",
     category: "web",
-    tags: ["Radix", "Tailwind", "Storybook"],
+    tags: ["React 18", "Tailwind", "Supabase","Kanban","zustand"],
     stats: { stars: 56, forks: 8 },
     featured: false,
-    color: "from-blue-500 to-cyan-500"
+    color: "from-blue-500 to-cyan-500",
+    image: "/public/project-4.png",
+    liveUrl: "https://taskaraa.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/TaskAraa"
   },
   {
     id: "proj-5",
-    title: "Hyperion Chat",
-    description: "Real-time encrypted messaging app using WebSockets and local-first architecture (CRDTs).",
-    author: "David Kim",
+    title: "SVIT LMS",
+    description: "Empower your internship program with structured courses, attendance tracking, assignment workflows, in-course notes, curated links, task management, and analytics — all on a single platform.",
+    author: "Eswar Chinthakayala",
     role: "Full Stack",
-    category: "systems",
-    tags: ["WebSockets", "CRDT", "Node.js"],
+    category: "web",
+    tags: ["React 18", "kanban", "Node.js","Supabase","etc"],
     stats: { stars: 92, forks: 21 },
     featured: false,
-    color: "from-pink-500 to-rose-500"
+    color: "from-pink-500 to-rose-500",
+    image: "/public/project-5.png",
+    liveUrl: "https://svit-lms.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/SVIT-LMS"
   },
   {
     id: "proj-6",
-    title: "Zenith Commerce",
-    description: "Headless e-commerce storefront utilizing Next.js App Router and Server Components for maximum SEO.",
-    author: "Elena R.",
-    role: "Frontend Dev",
+    title: "Recruits",
+    description: "Job Portal Application allows companies to post job listings and users to search and apply for jobs. It provides features for both job seekers and employers, with user-friendly interfaces and secure authentication.",
+    author: "Eswar Chinthakayala",
+    role: "Full Stack",
     category: "web",
-    tags: ["Next.js", "Stripe", "Sanity"],
+    tags: ["React.js", "Supabase", "MDeditor","etc"],
     stats: { stars: 45, forks: 5 },
     featured: false,
-    color: "from-zinc-500 to-zinc-300"
+    color: "from-zinc-500 to-zinc-300",
+     image: "/public/project-6.png",
+    liveUrl: "https://recrutis.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Recrutis"
+  },
+   {
+    id: "proj-7",
+    title: "Climetrik",
+    description: "A minimalist weather dashboard providing real-time climatic metrics and forecasts using modern web technologies.",
+    author: "Eswar Chinthakayala",
+    role: "Frontend dev",
+    category: "web",
+    tags: ["React.js","Weather API", "Vercel", "Typescript","etc"],
+    stats: { stars: 45, forks: 5 },
+    featured: false,
+      color: "from-pink-500 to-rose-500",
+     image: "/public/project-7.png",
+    liveUrl: "https://climetrik.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Recrutis"
   }
 ];
 
@@ -123,15 +159,14 @@ const FILTERS = [
 // ------------------------------------------------------------------
 // 2. REUSABLE COMPONENTS
 // ------------------------------------------------------------------
-
-const ProjectPreview = ({ category, color }) => {
+const ProjectPreview = ({ category, color, image }) => {
   return (
     <div
       className="
         w-full h-full relative overflow-hidden
         rounded-xl
         transition-transform duration-700
-        group-hover:scale-[1.04]
+        group-hover:scale-[1.02]
 
         bg-white
         dark:bg-zinc-900
@@ -163,7 +198,7 @@ const ProjectPreview = ({ category, color }) => {
           dark:bg-zinc-950/80 dark:border-zinc-800/50
         "
       >
-        {/* Header */}
+        {/* Header (Traffic Lights) */}
         <div
           className="
             flex items-center gap-2
@@ -173,10 +208,10 @@ const ProjectPreview = ({ category, color }) => {
             dark:border-zinc-800
           "
         >
-          <div className="flex gap-1">
-            <div className="w-2 h-2 rounded-full bg-red-500/60" />
-            <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
-            <div className="w-2 h-2 rounded-full bg-green-500/60" />
+          <div className="flex gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-red-500/80" />
+            <div className="w-2 h-2 rounded-full bg-amber-500/80" />
+            <div className="w-2 h-2 rounded-full bg-emerald-500/80" />
           </div>
 
           <div
@@ -189,51 +224,61 @@ const ProjectPreview = ({ category, color }) => {
           />
         </div>
 
-        {/* ---------------- WEB ---------------- */}
+        {/* ---------------- WEB PREVIEW ---------------- */}
         {category === "web" && (
-          <div className="flex gap-2 h-full">
+          <div className="flex gap-2 h-full overflow-hidden">
             {/* Sidebar */}
             <div
               className="
-                w-1/4 min-w-[28px]
+                w-1/4 
                 rounded-md
                 bg-zinc-100
-                dark:bg-zinc-900
+                dark:bg-zinc-900/50
               "
             />
 
-            {/* Main */}
-            <div className="flex-1 flex flex-col gap-2">
-              <div
-                className="
-                  relative h-20 sm:h-24
-                  rounded-md overflow-hidden
-                  bg-zinc-200
-                  dark:bg-zinc-800/60
-                "
-              >
-                <div
-                  className={cn(
-                    "absolute inset-0 opacity-10 bg-gradient-to-r",
-                    color
-                  )}
-                />
-              </div>
-
-              <div className="flex gap-2 flex-1">
-                <div className="flex-1 rounded-md bg-zinc-100 dark:bg-zinc-900" />
-                <div className="flex-1 rounded-md bg-zinc-100 dark:bg-zinc-900" />
-              </div>
-            </div>
+          
+              {image ? (
+                <div className="absolute inset-0 rounded-md overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                   <img 
+                    src={image} 
+                    alt="Project" 
+                    className="w-full h-full object-cover object-top" 
+                   />
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="
+                      relative h-20 sm:h-24
+                      rounded-md overflow-hidden
+                      bg-zinc-200
+                      dark:bg-zinc-800/60
+                    "
+                  >
+                    <div
+                      className={cn(
+                        "absolute inset-0 opacity-10 bg-gradient-to-r",
+                        color
+                      )}
+                    />
+                  </div>
+                  <div className="flex gap-2 flex-1">
+                    <div className="flex-1 rounded-md bg-zinc-100 dark:bg-zinc-900" />
+                    <div className="flex-1 rounded-md bg-zinc-100 dark:bg-zinc-900" />
+                  </div>
+                </>
+              )}
+          
           </div>
         )}
 
-        {/* ---------------- MOBILE ---------------- */}
+        {/* ---------------- MOBILE PREVIEW ---------------- */}
         {category === "mobile" && (
           <div className="flex justify-center h-full pt-1">
             <div
               className="
-                w-14 sm:w-16 md:w-20
+                w-16 sm:w-20
                 h-full
                 rounded-t-2xl
                 border-x border-t
@@ -251,15 +296,26 @@ const ProjectPreview = ({ category, color }) => {
                   dark:bg-zinc-900
                 "
               >
-                <div className="absolute top-2 left-2 right-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-800" />
-                <div className="absolute top-6 left-2 h-8 w-8 rounded-full bg-zinc-300 dark:bg-zinc-800" />
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-zinc-200/70 dark:bg-zinc-800/50 backdrop-blur-md" />
+                {image ? (
+                   <img 
+                    src={image} 
+                    alt="App" 
+                    className="w-full h-full object-cover object-top" 
+                   />
+                ) : (
+                   <>
+                    <div className="absolute top-2 left-2 right-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-800" />
+                    <div className="absolute top-6 left-2 h-8 w-8 rounded-full bg-zinc-300 dark:bg-zinc-800" />
+                   </>
+                )}
+                {/* Notch/Island Hint */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-2 bg-black rounded-b-lg z-10 pointer-events-none"></div>
               </div>
             </div>
           </div>
         )}
 
-        {/* ---------------- SYSTEMS ---------------- */}
+        {/* ---------------- SYSTEMS PREVIEW ---------------- */}
         {category === "systems" && (
           <div
             className="
@@ -267,10 +323,12 @@ const ProjectPreview = ({ category, color }) => {
               font-mono
               text-[7px] sm:text-[8px]
               leading-relaxed
-              p-1
-
+              p-2
+              rounded-md
+              bg-zinc-50 dark:bg-black/50
               text-zinc-600
-              dark:text-zinc-500
+              dark:text-zinc-400
+              overflow-hidden
             "
           >
             <span className="text-purple-500">fn</span> main() {"{"}
@@ -299,8 +357,6 @@ const ProjectPreview = ({ category, color }) => {
     </div>
   );
 };
-
-
 const SidebarContent = ({ onNavigate }) => (
   <div
     className="
@@ -459,7 +515,7 @@ export default function ShowcasePage() {
   const featuredProject = SHOWCASE_DATA.find(p => p.featured);
 
   return (
-    <div className="flex min-h-screen w-full mt-20  text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
+    <div className="flex min-h-screen w-full mt-20 text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
       
       {/* DESKTOP SIDEBAR */}
       <aside className="w-80 border-r border-zinc-300 dark:border-zinc-800 hidden xl:flex z-30">
@@ -467,7 +523,7 @@ export default function ShowcasePage() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-w-0  over relative">
+      <main className="flex-1 flex flex-col min-w-0 relative">
         
       {/* Background Grid */}
         <div className="absolute inset-0 z-0 pointer-events-none">
@@ -541,7 +597,7 @@ export default function ShowcasePage() {
                     </SheetContent>
                 </Sheet>
 
-                {/* Search (hidden on small screens) */}
+                {/* Search */}
                 <div className="relative w-full group ">
                     <Search
                     className="
@@ -572,8 +628,6 @@ export default function ShowcasePage() {
                     />
                 </div>
                 </div>
-
-
             </div>
             </header>
 
@@ -719,28 +773,24 @@ export default function ShowcasePage() {
                             </Badge>
                             ))}
                         </div>
+                        
+                        {/* New Action Buttons for Featured */}
+                        <div className="flex flex-wrap gap-3 pt-2">
+                            <Button 
+                                className="bg-zinc-900 cursor-pointer dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+                                onClick={(e) => { e.stopPropagation(); window.open(featuredProject.liveUrl, '_blank')}}
+                            >
+                                <Eye className="w-4 h-4 mr-2" /> Live Preview
+                            </Button>
+                            <Button 
+                                variant="outline" 
+                                className="border-zinc-300 dark:border-zinc-700 text-black dark:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                onClick={(e) => { e.stopPropagation(); window.open(featuredProject.repoUrl, '_blank')}}
+                            >
+                                <Github className="w-4 h-4 mr-2" /> Source Code
+                            </Button>
                         </div>
 
-                        {/* CTA */}
-                        <div className="flex justify-start md:justify-end">
-                        <Button
-                            size="lg"
-                            className="
-                            h-11 sm:h-12
-                            px-6 sm:px-8
-                            rounded-full
-                            font-bold
-                            bg-black text-white
-                            hover:bg-zinc-800
-
-                            dark:bg-white
-                            dark:text-black
-                            dark:hover:bg-zinc-200
-                            "
-                        >
-                            View Case Study
-                            <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
                         </div>
                     </div>
                     </motion.section>
@@ -779,11 +829,10 @@ export default function ShowcasePage() {
                     <motion.div
                     layout
                     className="
-                        grid gap-5
+                        grid gap-6
                         grid-cols-1
                         sm:grid-cols-2
                         lg:grid-cols-3
-                   
                     "
                     >
                     <AnimatePresence>
@@ -802,7 +851,7 @@ export default function ShowcasePage() {
                             shadow-sm
                             transition-all
 
-                            hover:shadow-xl
+                            hover:shadow-2xl
                             hover:-translate-y-1
 
                             dark:bg-zinc-900/40
@@ -816,103 +865,104 @@ export default function ShowcasePage() {
                                 aspect-video w-full overflow-hidden border-b
                                 border-zinc-200
                                 dark:border-zinc-800
+                                relative
                             "
                             >
-                            <ProjectPreview
-                                category={project.category}
-                                color={project.color}
-                            />
+                                <ProjectPreview
+                                    category={project.category}
+                                    color={project.color}
+                                    image={project.image}
+                                />
+                                
+                                {/* Overlay Link on entire preview for quick access */}
+                                <a 
+                                    href={project.liveUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto"
+                                >
+                                </a>
                             </div>
 
                             {/* ---------- Body ---------- */}
-                            <div className="p-4 sm:p-5 flex flex-col gap-4 flex-1">
-                            <div>
-                                <div className="flex justify-between items-start gap-3 mb-2">
-                                <h3
-                                    className="
-                                    text-lg sm:text-xl font-semibold
-                                    text-zinc-900
-                                    group-hover:text-zinc-600
-                                    transition-colors
+                            <div className="p-5 flex flex-col gap-4 flex-1">
+                                <div>
+                                    <div className="flex justify-between items-start gap-3 mb-2">
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">
+                                            {project.title}
+                                        </h3>
+                                        
+                                        <div className="flex gap-2">
+                                            <div className="flex items-center gap-1 text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-400">
+                                                <Star className="w-3 h-3" />
+                                                {project.stats.stars}
+                                            </div>
+                                            <div className="flex items-center gap-1 text-[10px] bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md text-zinc-600 dark:text-zinc-400">
+                                                <GitBranch className="w-3 h-3" />
+                                                {project.stats.forks}
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                    dark:text-white
-                                    dark:group-hover:text-zinc-300
-                                    "
-                                >
-                                    {project.title}
-                                </h3>
-
-                                <div className="flex items-center gap-3 text-xs font-mono text-zinc-500 dark:text-zinc-400">
-                                    <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-white transition">
-                                    <Star className="w-3.5 h-3.5" />
-                                    {project.stats.stars}
-                                    </span>
-                                    <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-white transition cursor-pointer">
-                                    <Github className="w-3.5 h-3.5" />
-                                    </span>
-                                </div>
+                                    <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                                        {project.description}
+                                    </p>
                                 </div>
 
-                                <p
-                                className="
-                                    text-sm leading-relaxed line-clamp-3
-                                    text-zinc-600
-                                    dark:text-zinc-400
-                                "
-                                >
-                                {project.description}
-                                </p>
-                            </div>
-
-                            {/* ---------- Footer ---------- */}
-                            <div
-                                className="
-                                mt-auto pt-4 flex items-center justify-between border-t
-                                border-zinc-200
-                                dark:border-zinc-800
-                                "
-                            >
-                                <div className="flex items-center gap-3 min-w-0">
-                                <div
-                                    className="
-                                    w-7 h-7 rounded-full flex items-center justify-center
-                                    text-[11px] font-bold
-                                    bg-gradient-to-tr from-zinc-300 to-zinc-200
-                                    text-zinc-700
-
-                                    dark:from-zinc-700 dark:to-zinc-600
-                                    dark:text-zinc-200
-                                    "
-                                >
-                                    {project.author.charAt(0)}
+                                {/* ---------- New Action Buttons ---------- */}
+                                <div className="grid grid-cols-2 gap-2 mt-auto">
+                                    <a 
+                                        href={project.liveUrl} 
+                                        target="_blank" 
+                                        rel="noreferrer"
+                                        className="
+                                            flex items-center justify-center gap-2 
+                                            px-3 py-2 rounded-lg text-xs font-semibold
+                                            bg-zinc-900 text-white 
+                                            hover:bg-zinc-700
+                                            dark:bg-zinc-100 dark:text-zinc-900
+                                            dark:hover:bg-zinc-200
+                                            transition-colors
+                                        "
+                                    >
+                                        <Eye className="w-3.5 h-3.5" />
+                                        Live Preview
+                                    </a>
+                                    <a 
+                                        href={project.repoUrl} 
+                                        target="_blank" 
+                                        rel="noreferrer"
+                                        className="
+                                            flex items-center justify-center gap-2 
+                                            px-3 py-2 rounded-lg text-xs font-semibold
+                                            border border-zinc-200 bg-white text-zinc-700
+                                            hover:bg-zinc-50 hover:text-black
+                                            dark:border-zinc-700 dark:bg-transparent dark:text-zinc-300
+                                            dark:hover:bg-zinc-800 dark:hover:text-white
+                                            transition-colors
+                                        "
+                                    >
+                                        <Code className="w-3.5 h-3.5" />
+                                        Source
+                                    </a>
                                 </div>
 
-                                <div className="flex flex-col truncate">
-                                    <span className="text-xs font-medium text-zinc-800 dark:text-zinc-300 truncate">
-                                    {project.author}
-                                    </span>
-                                    <span className="text-[10px] text-zinc-500 dark:text-zinc-500 truncate">
-                                    {project.role}
-                                    </span>
+                                {/* ---------- Footer ---------- */}
+                                <div className="pt-4 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold bg-gradient-to-tr from-zinc-200 to-white border border-zinc-200 dark:from-zinc-800 dark:to-zinc-700 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300">
+                                            {project.author.charAt(0)}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-[11px] font-medium text-zinc-900 dark:text-zinc-200">
+                                                {project.author}
+                                            </span>
+                                            <span className="text-[10px] text-zinc-500 dark:text-zinc-500">
+                                                {project.role}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                </div>
-
-                                <Button
-                                size="icon"
-                                variant="ghost"
-                                className="
-                                    rounded-full
-                                    text-zinc-500
-                                    hover:text-zinc-900
-                                    hover:bg-zinc-100
-
-                                    dark:hover:text-white
-                                    dark:hover:bg-zinc-800
-                                "
-                                >
-                                <ExternalLink className="w-4 h-4" />
-                                </Button>
-                            </div>
                             </div>
                         </motion.div>
                         ))}
