@@ -25,6 +25,7 @@ import {
   GitBranch,
   Rocket
 } from "lucide-react";
+import { useTheme } from "../components/theme-provider";
 
 // --- Utility Components ---
 
@@ -129,6 +130,13 @@ export default function LandingPage() {
     target: targetRef,
     offset: ["start start", "end start"],
   });
+
+    const { theme } = useTheme?.() ?? { theme: "system" };  
+    const isDark =
+         theme === "dark" ||
+         (theme === "system" &&
+           typeof window !== "undefined" &&
+           window.matchMedia("(prefers-color-scheme: dark)").matches); 
 
   const navigate=useNavigate()
 
@@ -325,6 +333,7 @@ export default function LandingPage() {
             transition-all
             font-medium
           "
+          onClick={()=>navigate("/docs")}
         >
           Read Docs
         </Button>

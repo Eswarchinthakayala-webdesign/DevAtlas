@@ -31,10 +31,34 @@ import {
   Globe,
   X
 } from "lucide-react";
-import { useTheme } from "../components/theme-provider";
+import { useTheme } from "@/components/theme-provider";
+import '../markdown.css'
+// ------------------------------------------------------------------
+// 1. UTILITY: SLUGIFY
+// Converts "Core Concepts" -> "core-concepts" for IDs
+// ------------------------------------------------------------------
+const slugify = (text) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w\-]+/g, "") // Remove all non-word chars
+    .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+};
+
+// Helper to extract raw text from React children (for the ID generation)
+const getNodeText = (node) => {
+  if (["string", "number"].includes(typeof node)) return node;
+  if (node instanceof Array) return node.map(getNodeText).join("");
+  if (typeof node === "object" && node?.props?.children)
+    return getNodeText(node.props.children);
+  return "";
+};
 
 // ------------------------------------------------------------------
-// 1. MOCK DOCUMENTATION DATA
+// 2. MOCK DOCUMENTATION DATA
 // ------------------------------------------------------------------
 
 const DOCS_DATA = [
@@ -200,11 +224,10 @@ console.log(profile.streak); // 12
   }
 ];
 
-
-
 // ------------------------------------------------------------------
-// 2. COMPONENTS
+// 3. COMPONENTS
 // ------------------------------------------------------------------
+
 const SidebarContent = ({
   activeDocId,
   setActiveDocId,
@@ -337,7 +360,7 @@ const SidebarContent = ({
                     }}
                     className={cn(
                       `
-                      relative w-full text-left px-2 py-1.5 rounded-md text-sm transition-all
+                      relative w-full cursor-pointer text-left px-2 py-1.5 rounded-md text-sm transition-all
                       `,
                       activeDocId === item.id
                         ? `
@@ -352,6 +375,7 @@ const SidebarContent = ({
                   >
                     {item.title}
 
+                    {/* Active Indicator: Aligned vertically on the border line */}
                     {activeDocId === item.id && (
                       <span
                         className="
@@ -382,7 +406,6 @@ const SidebarContent = ({
   </aside>
 );
 
-
 // ------------------------------------------------------------------
 // 4. MAIN PAGE
 // ------------------------------------------------------------------
@@ -400,8 +423,6 @@ export default function DocumentationPage() {
        (theme === "system" &&
          typeof window !== "undefined" &&
          window.matchMedia("(prefers-color-scheme: dark)").matches);  
-  
-
 
   // Scroll to top when doc changes
   useEffect(() => {
@@ -416,7 +437,6 @@ export default function DocumentationPage() {
     const lowerQuery = searchQuery.toLowerCase();
 
     return DOCS_DATA.map(section => {
-      // Filter items matching title or content
       const filteredItems = section.items.filter(item => 
         item.title.toLowerCase().includes(lowerQuery) || 
         item.content.toLowerCase().includes(lowerQuery)
@@ -426,29 +446,34 @@ export default function DocumentationPage() {
         return { ...section, items: filteredItems };
       }
       return null;
-    }).filter(Boolean); // Remove empty categories
+    }).filter(Boolean);
   }, [searchQuery]);
 
-  // --- LOGIC: NEXT / PREV BUTTONS (Use filtered or full list?) ---
-  // Using full list ensures next/prev logic remains consistent even if filtered
+  // --- LOGIC: NEXT / PREV BUTTONS ---
   const flatDocs = useMemo(() => DOCS_DATA.flatMap(s => s.items), []);
-  
-  // Find active doc in full list
   const currentIndex = flatDocs.findIndex(i => i.id === activeDocId);
-  
-  // Fallback if active doc is hidden by filter (optional safety)
-  // If the user searches "API" and the current doc "Intro" disappears, 
-  // we still show the "Intro" content until they click a result.
   const activeDoc = flatDocs[currentIndex];
-  
   const prevDoc = flatDocs[currentIndex - 1];
   const nextDoc = flatDocs[currentIndex + 1];
 
-  // Generate Table of Contents from active markdown
-  const toc = activeDoc ? activeDoc.content.match(/^## (.*$)/gm)?.map(h => h.replace('## ', '')) || [] : [];
+  // --- LOGIC: TABLE OF CONTENTS ---
+  // Generate TOC based on the regex of ## headers in raw markdown
+  const toc = useMemo(() => {
+    if (!activeDoc) return [];
+    return activeDoc.content.match(/^## (.*$)/gm)?.map(h => h.replace('## ', '')) || [];
+  }, [activeDoc]);
+
+  // --- LOGIC: SCROLL TO SECTION ---
+  const handleScrollToSection = (e, id) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
-    <div className="flex min-h-screen mt-20 w-full  scroll-smooth text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
+    <div className="flex min-h-screen mt-20 w-full scroll-smooth text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
       
       {/* DESKTOP SIDEBAR */}
       <aside className="w-80 border-r border-zinc-300 dark:border-zinc-800 hidden xl:flex z-30">
@@ -460,170 +485,115 @@ export default function DocumentationPage() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-w-0  relative">
+      <main className="flex-1 flex flex-col min-w-0 relative">
         {/* Background Grid */}
         <div className="absolute inset-0 z-0 pointer-events-none">
         <div
             className="
             absolute inset-0
-
-            /* Grid lines */
             bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),
                 linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)]
-
-            /* Mobile default */
-            bg-[size:20px_20px]
-
-            /* Tablet */
-            sm:bg-[size:24px_24px]
-
-            /* Desktop */
-            lg:bg-[size:32px_32px]
-
-            /* Dark theme */
+            bg-[size:20px_20px] sm:bg-[size:24px_24px] lg:bg-[size:32px_32px]
             dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),
                     linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]
             "
         />
         </div>
 
-
-{/* Header */}
-<header
-  className="
-    sticky top-0 z-40 h-16
-    border-b
-    border-zinc-200
-    flex items-center justify-between
-    px-3 sm:px-4 md:px-6
-    dark:border-zinc-800
-  "
->
-  {/* LEFT */}
-  <div className="flex items-center gap-3 flex-1 min-w-0">
-    {/* Mobile Menu */}
-    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
+        {/* Header */}
+        <header
           className="
-            xl:hidden
-            text-zinc-600 hover:text-zinc-900
-            dark:text-zinc-400 dark:hover:text-white
+            sticky top-0 z-40 h-16
+            border-b
+            border-zinc-200
+            flex items-center justify-between
+            px-3 sm:px-4 md:px-6
+            dark:border-zinc-800
+            
+            backdrop-blur-xl
           "
         >
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
+          {/* LEFT */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {/* Mobile Menu */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="
+                    xl:hidden
+                    text-zinc-600 hover:text-zinc-900
+                    dark:text-zinc-400 dark:hover:text-white
+                  "
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
 
-      <SheetContent
-        side="left"
-        className="
-          p-0 w-80
-          bg-white text-zinc-900
-          border-r border-zinc-200
+              <SheetContent
+                side="left"
+                className="
+                  p-0 w-80
+                  bg-white text-zinc-900
+                  border-r border-zinc-200
+                  dark:bg-zinc-950 dark:border-zinc-800 dark:text-white
+                "
+              >
+                <SidebarContent
+                  activeDocId={activeDocId}
+                  setActiveDocId={setActiveDocId}
+                  docsData={filteredDocs}
+                  onNavigate={() => setIsMobileMenuOpen(false)}
+                />
+              </SheetContent>
+            </Sheet>
 
-          dark:bg-zinc-950 dark:border-zinc-800 dark:text-white
-        "
-      >
-        <SidebarContent
-          activeDocId={activeDocId}
-          setActiveDocId={setActiveDocId}
-          docsData={filteredDocs}
-          onNavigate={() => setIsMobileMenuOpen(false)}
-        />
-      </SheetContent>
-    </Sheet>
+            {/* Breadcrumb */}
+            <div className="hidden md:flex items-center gap-2 text-sm truncate">
+              <span className="text-zinc-500 dark:text-zinc-500">Docs</span>
+              <ChevronRight className="w-3 h-3 text-zinc-400" />
+              <span className="truncate text-zinc-900 dark:text-zinc-200 font-medium">
+                {activeDoc?.title}
+              </span>
+            </div>
+          </div>
 
-    {/* Breadcrumb (hidden on small) */}
-    <div className="hidden md:flex items-center gap-2 text-sm truncate">
-      <span className="text-zinc-500 dark:text-zinc-500">Docs</span>
-      <ChevronRight className="w-3 h-3 text-zinc-400" />
-      <span className="truncate text-zinc-900 dark:text-zinc-200 font-medium">
-        {activeDoc?.title}
-      </span>
-    </div>
-  </div>
-
-  {/* RIGHT */}
-  <div className="flex items-center gap-2 sm:gap-3">
-    {/* Search (Desktop / Tablet) */}
-    <div className="relative hidden sm:block w-56 md:w-64">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
-      <Input
-        placeholder="Search docs…"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="
-          h-9 pl-9 pr-9 rounded-full text-sm
-          bg-white border-zinc-200 text-zinc-900
-          focus:bg-white
-
-          dark:bg-zinc-900/70
-          dark:border-zinc-800
-          dark:text-white
-        "
-      />
-
-      {searchQuery ? (
-        <button
-          onClick={() => setSearchQuery("")}
-          className="
-            absolute right-3 top-1/2 -translate-y-1/2
-            text-zinc-400 hover:text-zinc-700
-            dark:hover:text-white
-          "
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-      ) : (
-        <kbd
-          className="
-            absolute right-3 top-1/2 -translate-y-1/2
-            hidden md:inline-flex
-            h-5 items-center gap-1 rounded
-            border border-zinc-200 bg-zinc-100
-            px-1.5 font-mono text-[10px] text-zinc-500
-
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400
-          "
-        >
-          ⌘ K
-        </kbd>
-      )}
-    </div>
-
-    {/* Divider */}
-    <div className="hidden sm:block h-6 w-px bg-zinc-200 dark:bg-zinc-800" />
-
-    {/* GitHub */}
-    <a
-      href="#"
-      className="
-        p-2 rounded-md
-        text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100
-        transition
-
-        dark:text-zinc-400
-        dark:hover:text-white
-        dark:hover:bg-zinc-800
-      "
-    >
-      <span className="sr-only">GitHub</span>
-      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-    </a>
-  </div>
-</header>
-
+          {/* RIGHT */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
+              <Input
+                placeholder="Search docs…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="
+                  h-9 pl-9 pr-9 rounded-full text-sm
+                  bg-white border-zinc-200 text-zinc-900
+                  focus:bg-white
+                  dark:bg-zinc-900/70
+                  dark:border-zinc-800
+                  dark:text-white
+                "
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </header>
 
         {/* Content Area */}
         <ScrollArea ref={contentRef} className="flex-1 z-10">
            <div className="max-w-[1600px] mx-auto flex">
               
               {/* Markdown Content */}
-              <div className="flex-1 min-w-0 p-6 md:p-12 lg:pr-16 overflow-hidden   sm:w-[clamp(100%,80vw,1280px)]
-                w-screen">
+              <div className="flex-1 min-w-0 p-6 md:p-12 lg:pr-16 overflow-hidden sm:w-[clamp(100%,80vw,1280px)] w-screen">
                  <motion.div
                     key={activeDocId}
                     initial={{ opacity: 0, y: 10 }}
@@ -637,116 +607,60 @@ export default function DocumentationPage() {
                         <span className="text-xs text-zinc-500">Last updated today</span>
                     </div>
 
-                    <div data-color-mode={isDark ? "dark" : "light"} className="prose prose-invert ">
+                    {/* CUSTOM MARKDOWN RENDERER WITH ID INJECTION */}
+                    <div data-color-mode={isDark ? "dark" : "light"} className="prose prose-invert max-w-none">
                         <MDEditor.Markdown 
                             source={activeDoc?.content} 
+                            components={{
+                                // Custom renderers to add IDs to headers
+                                h1: ({ children }) => <h1 id={slugify(getNodeText(children))}>{children}</h1>,
+                                h2: ({ children }) => <h2 id={slugify(getNodeText(children))}>{children}</h2>,
+                                h3: ({ children }) => <h3 id={slugify(getNodeText(children))}>{children}</h3>,
+                            }}
                             style={{ 
-                                backgroundColor: isDark?"transparent":"", 
-           
+                                backgroundColor: isDark ? "transparent" : "", 
                                 fontSize: '1rem'
                             }} 
-                           
                         />
                     </div>
 
-                    {/* Pagination / Next Steps */}
-                    <div
-                    className="
-                        mt-16 pt-8
-                        border-t border-zinc-200
-                        dark:border-zinc-800
-                    "
-                    >
-                    <div
-                        className="
-                        flex flex-col gap-4
-                        sm:flex-row sm:items-stretch sm:justify-between
-                        "
-                    >
-                        {/* Previous */}
+                    {/* Pagination */}
+                    <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-between">
                         <div className="flex-1">
                         {prevDoc && (
                             <Button
                             variant="outline"
                             onClick={() => setActiveDocId(prevDoc.id)}
                             className="
-                                w-full sm:w-auto
-                                h-auto px-4 py-3
-                                flex flex-col items-start gap-1
-                                rounded-xl transition
-
-                                cursor-pointer
-
-                                bg-white
-                                border-zinc-300
-                                text-zinc-700
-                                hover:bg-zinc-50
-                                hover:border-zinc-400
-
-                                dark:bg-black
-                                dark:border-zinc-800
-                                dark:text-zinc-300
-                                dark:hover:bg-zinc-900
-                                dark:hover:border-zinc-700
+                                w-full sm:w-auto h-auto px-4 py-3 flex flex-col items-start gap-1 rounded-xl transition cursor-pointer
+                                bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400
+                                dark:bg-black dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:border-zinc-700
                             "
                             >
-                            <span
-                                className="
-                                flex items-center gap-1
-                                text-[10px] font-semibold uppercase tracking-widest
-                                text-zinc-500 dark:text-zinc-500
-                                "
-                            >
-                                <ArrowLeft className="w-3 h-3" />
-                                Previous
+                            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
+                                <ArrowLeft className="w-3 h-3" /> Previous
                             </span>
-                            <span className="text-sm sm:text-base font-semibold">
-                                {prevDoc.title}
-                            </span>
+                            <span className="text-sm sm:text-base font-semibold">{prevDoc.title}</span>
                             </Button>
                         )}
                         </div>
 
-                        {/* Next */}
                         <div className="flex-1 sm:flex sm:justify-end">
                         {nextDoc && (
                             <Button
                             variant="outline"
                             onClick={() => setActiveDocId(nextDoc.id)}
                             className="
-                                w-full sm:w-auto
-                                h-auto px-4 py-3
-                                flex flex-col items-end gap-1 text-right
-                                rounded-xl transition
-                                
-                                cursor-pointer
-
-                                bg-white
-                                border-zinc-300
-                                text-zinc-700
-                                hover:bg-zinc-50
-                                hover:border-zinc-400
-
-                                dark:bg-black
-                                dark:border-zinc-800
-                                dark:text-zinc-300
-                                dark:hover:bg-zinc-900
-                                dark:hover:border-zinc-700
+                                w-full sm:w-auto h-auto px-4 py-3 flex flex-col items-end gap-1 text-right rounded-xl transition cursor-pointer
+                                bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400
+                                dark:bg-black dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:border-zinc-700
                             "
                             >
-                            <span
-                                className="
-                                flex items-center gap-1
-                                text-[10px] font-semibold uppercase tracking-widest
-                                text-zinc-500 dark:text-zinc-500
-                                "
-                            >
-                                Next
-                                <ChevronRight className="w-3 h-3" />
+                            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
+                                Next <ChevronRight className="w-3 h-3" />
                             </span>
-                            <span className="text-sm sm:text-base font-semibold">
-                                {nextDoc.title}
-                            </span>
+                            <span className="text-sm sm:text-base font-semibold">{nextDoc.title}</span>
                             </Button>
                         )}
                         </div>
@@ -757,116 +671,61 @@ export default function DocumentationPage() {
               </div>
 
               {/* Right Sidebar: Table of Contents */}
-                       
-            <div className="hidden lg:block w-72 sticky top-0 h-[calc(100vh-4rem)] p-8 pl-0">
-            <div
-                className="
-                lg:sticky lg:top-16
-                h-auto lg:h-[calc(100vh-4rem)]
-                px-4 lg:px-0
-                "
-            >
-                <div
-                className="
-                    relative
-                    rounded-xl lg:rounded-none
-                    border
-                    border-zinc-200
-                    bg-white
-                    p-5
-                    lg:p-0
-                    lg:pl-6
-                    lg:border-0
-                    lg:border-l
+              <div className="hidden lg:block w-72 sticky top-0 h-[calc(100vh-4rem)] p-8 pl-0">
+                <div className="lg:sticky lg:top-16 h-auto lg:h-[calc(100vh-4rem)] px-4 lg:px-0">
+                    <div className="
+                        relative rounded-xl lg:rounded-none border border-zinc-200 bg-white p-5 lg:p-0 lg:pl-6 lg:border-0 lg:border-l
+                        dark:bg-black dark:border-zinc-800
+                    ">
+                    <div className="pb-4">
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 text-zinc-600 dark:text-zinc-500">
+                        On This Page
+                        </h4>
 
-                    dark:bg-black
-                    dark:border-zinc-800
-                "
-                >
-                {/* ---------------- ON THIS PAGE ---------------- */}
-                <div className="pb-4">
-                    <h4
-                    className="
-                        text-xs font-bold uppercase tracking-widest mb-4
-                        text-zinc-600
-                        dark:text-zinc-500
-                    "
-                    >
-                    On This Page
-                    </h4>
+                        <ul className="space-y-2">
+                        {toc.length > 0 ? (
+                            toc.map((item, idx) => {
+                                const id = slugify(item);
+                                return (
+                                    <li key={idx}>
+                                        <a
+                                        href={`#${id}`}
+                                        onClick={(e) => handleScrollToSection(e, id)}
+                                        className="
+                                            block text-sm leading-snug transition-colors
+                                            text-zinc-600 hover:text-black
+                                            dark:text-zinc-400 dark:hover:text-white
+                                        "
+                                        >
+                                        {item}
+                                        </a>
+                                    </li>
+                                )
+                            })
+                        ) : (
+                            <li className="text-sm italic text-zinc-500 dark:text-zinc-600">
+                            No sub-sections
+                            </li>
+                        )}
+                        </ul>
+                    </div>
 
-                    <ul className="space-y-2">
-                    {toc.length > 0 ? (
-                        toc.map((item, idx) => (
-                        <li key={idx}>
-                            <a
-                            href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                            className="
-                                block text-sm leading-snug transition-colors
-                                text-zinc-600 hover:text-black
-                                dark:text-zinc-400 dark:hover:text-white
-                            "
-                            >
-                            {item}
-                            </a>
-                        </li>
-                        ))
-                    ) : (
-                        <li className="text-sm italic text-zinc-500 dark:text-zinc-600">
-                        No sub-sections
-                        </li>
-                    )}
-                    </ul>
-                </div>
-
-                {/* ---------------- COMMUNITY ---------------- */}
-                <div
-                    className="
-                    mt-6 pt-5
-                    border-t
-                    border-zinc-200
-                    dark:border-zinc-800
-                    "
-                >
-                    <h4
-                    className="
-                        text-xs font-bold uppercase tracking-widest mb-3
-                        text-zinc-600
-                        dark:text-zinc-500
-                    "
-                    >
-                    Community
-                    </h4>
-
-                    <div className="space-y-2">
-                    <a
-                        href="#"
-                        className="
-                        flex items-center gap-2 text-sm transition-colors
-                        text-zinc-600 hover:text-black
-                        dark:text-zinc-400 dark:hover:text-white
-                        "
-                    >
-                        <FileText className="w-3.5 h-3.5" />
-                        Edit on GitHub
-                    </a>
-
-                    <a
-                        href="#"
-                        className="
-                        flex items-center gap-2 text-sm transition-colors
-                        text-zinc-600 hover:text-black 
-                        dark:text-zinc-400 dark:hover:text-white
-                        "
-                    >
-                        <Check className="w-3.5 h-3.5" />
-                        Report an issue
-                    </a>
+                    <div className="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800">
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-3 text-zinc-600 dark:text-zinc-500">
+                        Community
+                        </h4>
+                        <div className="space-y-2">
+                        <a href="#" className="flex items-center gap-2 text-sm transition-colors text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white">
+                            <FileText className="w-3.5 h-3.5" /> Edit on GitHub
+                        </a>
+                        <a href="#" className="flex items-center gap-2 text-sm transition-colors text-zinc-600 hover:text-black dark:text-zinc-400 dark:hover:text-white">
+                            <Check className="w-3.5 h-3.5" /> Report an issue
+                        </a>
+                        </div>
+                    </div>
                     </div>
                 </div>
-                </div>
-            </div>
-            </div>
+              </div>
 
            </div>
         </ScrollArea>

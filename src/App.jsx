@@ -10,6 +10,7 @@ import ShowcasePage from './pages/ShowcasePage'
 import DocumentationPage from './pages/DocumentationPage'
 import InitializeLearning from './pages/InitializeLearning'
 import UserProfilePage from './pages/UserProfilePage'
+import LearningPage from './pages/LearningPage'
 
 
 const router=createBrowserRouter([
@@ -38,6 +39,10 @@ const router=createBrowserRouter([
         path:"/docs",
         element:<DocumentationPage/>
 
+      },
+      {
+        path:"/learning/:trackId/:moduleId/:lessonId",
+        element:<LearningPage/>
       },
       {
          path:"/initialization",

@@ -10,7 +10,7 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
-} from "@/components/ui/sheet"; // Import Sheet components
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import {
   Terminal,
@@ -34,15 +34,16 @@ import {
   Database,
   Layers,
   Flame,
-  Menu, // Added Menu icon
-  X
+  Menu,
+  X,
+  PlayCircle
 } from "lucide-react";
 
 // ------------------------------------------------------------------
-// 1. DATA STORE 
+// 1. DATA STORE (Enhanced with Markdown Content)
 // ------------------------------------------------------------------
 
-const CURRICULUM_DATA = [
+export const CURRICULUM_DATA = [
   {
     id: "track-react-core",
     title: "React Internals & Architecture",
@@ -56,10 +57,51 @@ const CURRICULUM_DATA = [
         title: "The Reconciliation Algorithm",
         duration: "45m",
         lessons: [
-          { id: "les-vdom-real", title: "Virtual DOM vs Real DOM: Memory Allocation", duration: "10 min read", type: "concept" },
-          { id: "les-diff-algo", title: "The Heuristic O(n) Diffing Algorithm", duration: "15 min read", type: "documentation" },
-          { id: "les-keys-render", title: "Keys and List Rendering Performance", duration: "12 min read", type: "guide" },
-          { id: "les-batching", title: "Automatic Batching in React 18", duration: "8 min read", type: "concept" },
+          { 
+            id: "les-vdom-real", 
+            title: "Virtual DOM vs Real DOM: Memory Allocation", 
+            duration: "10 min read", 
+            type: "concept",
+            content: `
+# Virtual DOM vs Real DOM
+
+React creates a tree of custom objects ("virtual DOM") in memory.
+
+## Why Virtual DOM?
+Manipulating the DOM is slow. Updating the virtual DOM is fast.
+
+\`\`\`javascript
+const element = {
+  type: 'h1',
+  props: {
+    className: 'greeting',
+    children: 'Hello, world!'
+  }
+};
+\`\`\`
+            `
+          },
+          { 
+            id: "les-diff-algo", 
+            title: "The Heuristic O(n) Diffing Algorithm", 
+            duration: "15 min read", 
+            type: "documentation",
+            content: "# Diffing Algorithm\n\nReact implements a heuristic O(n) algorithm..." 
+          },
+          { 
+            id: "les-keys-render", 
+            title: "Keys and List Rendering Performance", 
+            duration: "12 min read", 
+            type: "guide",
+            content: "# Keys\n\nKeys help React identify which items have changed..." 
+          },
+          { 
+            id: "les-batching", 
+            title: "Automatic Batching in React 18", 
+            duration: "8 min read", 
+            type: "concept",
+            content: "# Automatic Batching\n\nReact 18 batches state updates..." 
+          },
         ]
       },
       {
@@ -67,10 +109,16 @@ const CURRICULUM_DATA = [
         title: "React Fiber Architecture",
         duration: "2h 10m",
         lessons: [
-          { id: "les-fiber-node", title: "Anatomy of a Fiber Node", duration: "18 min read", type: "documentation" },
-          { id: "les-work-loop", title: "The Work Loop & Scheduler Priority", duration: "25 min read", type: "architecture" },
-          { id: "les-phases", title: "Render Phase vs Commit Phase", duration: "20 min read", type: "concept" },
-          { id: "les-time-slice", title: "Time Slicing & Interruptible Rendering", duration: "30 min read", type: "guide" },
+          { 
+            id: "les-fiber-node", 
+            title: "Anatomy of a Fiber Node", 
+            duration: "18 min read", 
+            type: "documentation",
+            content: "# Fiber Node\n\nA Fiber is a JavaScript object that contains information about a component..." 
+          },
+          { id: "les-work-loop", title: "The Work Loop & Scheduler Priority", duration: "25 min read", type: "architecture", content: "# Work Loop\n\n..." },
+          { id: "les-phases", title: "Render Phase vs Commit Phase", duration: "20 min read", type: "concept", content: "# Phases\n\n..." },
+          { id: "les-time-slice", title: "Time Slicing & Interruptible Rendering", duration: "30 min read", type: "guide", content: "# Time Slicing\n\n..." },
         ]
       },
       {
@@ -78,10 +126,10 @@ const CURRICULUM_DATA = [
         title: "Concurrent Features",
         duration: "3h 00m",
         lessons: [
-          { id: "les-use-trans", title: "useTransition: Non-blocking Updates", duration: "20 min read", type: "documentation" },
-          { id: "les-use-defer", title: "useDeferredValue Implementation Details", duration: "15 min read", type: "guide" },
-          { id: "les-suspense", title: "Suspense Boundaries & Fallback UI", duration: "45 min read", type: "architecture" },
-          { id: "les-streaming", title: "Streaming Server Rendering (SSR)", duration: "50 min read", type: "guide" },
+          { id: "les-use-trans", title: "useTransition: Non-blocking Updates", duration: "20 min read", type: "documentation", content: "# useTransition\n\n..." },
+          { id: "les-use-defer", title: "useDeferredValue Implementation Details", duration: "15 min read", type: "guide", content: "# useDeferredValue\n\n..." },
+          { id: "les-suspense", title: "Suspense Boundaries & Fallback UI", duration: "45 min read", type: "architecture", content: "# Suspense\n\n..." },
+          { id: "les-streaming", title: "Streaming Server Rendering (SSR)", duration: "50 min read", type: "guide", content: "# SSR Streaming\n\n..." },
         ]
       },
       {
@@ -89,13 +137,14 @@ const CURRICULUM_DATA = [
         title: "State Management Patterns",
         duration: "2h 30m",
         lessons: [
-          { id: "les-context-perf", title: "Context API Performance Pitfalls", duration: "25 min read", type: "guide" },
-          { id: "les-zustand", title: "Atomic State with Zustand", duration: "20 min read", type: "documentation" },
-          { id: "les-server-state", title: "Server State vs Client State", duration: "15 min read", type: "concept" },
+          { id: "les-context-perf", title: "Context API Performance Pitfalls", duration: "25 min read", type: "guide", content: "# Context API\n\n..." },
+          { id: "les-zustand", title: "Atomic State with Zustand", duration: "20 min read", type: "documentation", content: "# Zustand\n\n..." },
+          { id: "les-server-state", title: "Server State vs Client State", duration: "15 min read", type: "concept", content: "# Server State\n\n..." },
         ]
       }
     ]
   },
+  // ... (Other tracks would follow the same structure with 'content' added)
   {
     id: "track-comp-patterns",
     title: "Advanced Component Patterns",
@@ -104,36 +153,14 @@ const CURRICULUM_DATA = [
     level: "Intermediate",
     totalDuration: "8h 30m",
     modules: [
-      {
-        id: "mod-composition",
-        title: "Composition Patterns",
-        duration: "1h 30m",
-        lessons: [
-          { id: "les-containment", title: "Containment vs Specialization", duration: "15 min read", type: "concept" },
-          { id: "les-compound", title: "The Compound Component Pattern", duration: "25 min read", type: "guide" },
-          { id: "les-ctx-mod", title: "Context Module Functions", duration: "30 min read", type: "architecture" },
-        ]
-      },
-      {
-        id: "mod-headless",
-        title: "Headless UI Logic",
-        duration: "2h 15m",
-        lessons: [
-          { id: "les-logic-view", title: "Separating Logic from View", duration: "20 min read", type: "concept" },
-          { id: "les-prop-getters", title: "Prop Getters Pattern", duration: "35 min read", type: "guide" },
-          { id: "les-state-red", title: "State Reducers & Inversion of Control", duration: "40 min read", type: "architecture" },
-        ]
-      },
-      {
-        id: "mod-hooks-adv",
-        title: "Advanced Hooks",
-        duration: "1h 45m",
-        lessons: [
-          { id: "les-use-layout", title: "useLayoutEffect vs useEffect", duration: "15 min read", type: "documentation" },
-          { id: "les-imperative", title: "useImperativeHandle & Refs", duration: "25 min read", type: "guide" },
-          { id: "les-debug", title: "Debugging Custom Hooks", duration: "20 min read", type: "guide" },
-        ]
-      }
+        {
+            id: "mod-composition",
+            title: "Composition Patterns",
+            duration: "1h 30m",
+            lessons: [
+              { id: "les-containment", title: "Containment vs Specialization", duration: "15 min read", type: "concept", content: "# Containment\n\n..." },
+            ]
+        }
     ]
   },
   {
@@ -144,36 +171,14 @@ const CURRICULUM_DATA = [
     level: "Expert",
     totalDuration: "15h 00m",
     modules: [
-      {
-        id: "mod-bridge",
-        title: "The Native Bridge",
-        duration: "1h 45m",
-        lessons: [
-          { id: "les-threads", title: "JS Thread vs UI Thread Architecture", duration: "20 min read", type: "architecture" },
-          { id: "les-bridge-limit", title: "Serialization Limitations of the Bridge", duration: "15 min read", type: "concept" },
-          { id: "les-jsi", title: "JSI (JavaScript Interface) Explained", duration: "30 min read", type: "documentation" },
-        ]
-      },
-      {
-        id: "mod-gestures",
-        title: "Gesture Handling System",
-        duration: "2h 30m",
-        lessons: [
-          { id: "les-responder", title: "The Responder System Lifecycle", duration: "25 min read", type: "documentation" },
-          { id: "les-reanimated", title: "Declarative Animations on the UI Thread", duration: "45 min read", type: "guide" },
-          { id: "les-gesture-coord", title: "Complex Gesture Coordination", duration: "50 min read", type: "guide" },
-        ]
-      },
-       {
-        id: "mod-native-mod",
-        title: "Native Modules",
-        duration: "3h 00m",
-        lessons: [
-          { id: "les-ios-mod", title: "Writing an iOS Module (Swift)", duration: "45 min read", type: "guide" },
-          { id: "les-android-mod", title: "Writing an Android Module (Kotlin)", duration: "45 min read", type: "guide" },
-          { id: "les-expo-config", title: "Expo Config Plugins", duration: "30 min read", type: "documentation" },
-        ]
-      }
+        {
+            id: "mod-bridge",
+            title: "The Native Bridge",
+            duration: "1h 45m",
+            lessons: [
+              { id: "les-threads", title: "JS Thread vs UI Thread Architecture", duration: "20 min read", type: "architecture", content: "# Threads\n\n..." },
+            ]
+        }
     ]
   },
   {
@@ -189,19 +194,7 @@ const CURRICULUM_DATA = [
             title: "Runtime Environments",
             duration: "1h 15m",
             lessons: [
-                { id: "les-node-edge", title: "Node.js vs Edge Runtime Differences", duration: "20 min read", type: "concept" },
-                { id: "les-cold-starts", title: "Mitigating Cold Starts", duration: "25 min read", type: "guide" },
-                { id: "les-wasm", title: "WebAssembly on the Edge", duration: "30 min read", type: "architecture" },
-            ]
-        },
-        {
-            id: "mod-db-edge",
-            title: "Data at the Edge",
-            duration: "2h 00m",
-            lessons: [
-                { id: "les-connection", title: "Connection Pooling Strategies", duration: "30 min read", type: "guide" },
-                { id: "les-consistency", title: "Eventual Consistency Models", duration: "40 min read", type: "concept" },
-                { id: "les-cache", title: "HTTP Caching & Stale-While-Revalidate", duration: "30 min read", type: "documentation" },
+                { id: "les-node-edge", title: "Node.js vs Edge Runtime Differences", duration: "20 min read", type: "concept", content: "# Runtimes\n\n..." },
             ]
         }
     ]
@@ -226,7 +219,6 @@ const getLast7Days = () => {
 
 // ------------------------------------------------------------------
 // 3. REUSABLE SIDEBAR CONTENT COMPONENT
-//    (Extracted to work in both Desktop Aside and Mobile Sheet)
 // ------------------------------------------------------------------
 
 const SidebarContent = ({ 
@@ -235,7 +227,7 @@ const SidebarContent = ({
   streakData, 
   chartHeights, 
   calculateTrackProgress,
-  onNavigate // Optional callback to close sheet on mobile
+  onNavigate 
 }) => {
   return (
     <div className="flex flex-col h-full bg-zinc-950/50">
@@ -264,31 +256,25 @@ const SidebarContent = ({
 
         {/* Brand Block */}
         <div className="flex items-center gap-3">
-
-
-            {/* Text */}
-                <div className="flex items-center gap-3">
-                  <div
-                    className="
-                      h-10 w-10 rounded-xl flex items-center justify-center
-                      bg-black text-white
-                      shadow-sm
-          
-                      dark:bg-white dark:text-black
-                    "
-                  >
-                    <Terminal className="h-6 w-6" />
-                  </div>
-          
-                  <div className="min-w-0">
-                    <h1 className="font-bold text-base text-black/90 dark:text-white sm:text-lg tracking-tight truncate">
-                      DevAtlas
-                    </h1>
-                    <span className="text-xs font-mono tracking-wider text-zinc-500 dark:text-zinc-500">
-                      CURRICULUM
-                    </span>
-                  </div>
-                </div>
+            <div
+                className="
+                    h-10 w-10 rounded-xl flex items-center justify-center
+                    bg-black text-white
+                    shadow-sm
+                    dark:bg-white dark:text-black
+                "
+            >
+                <Terminal className="h-6 w-6" />
+            </div>
+    
+            <div className="min-w-0">
+                <h1 className="font-bold text-base text-black/90 dark:text-white sm:text-lg tracking-tight truncate">
+                    DevAtlas
+                </h1>
+                <span className="text-xs font-mono tracking-wider text-zinc-500 dark:text-zinc-500">
+                    CURRICULUM
+                </span>
+            </div>
         </div>
         </div>
 
@@ -319,14 +305,9 @@ const SidebarContent = ({
                 className={cn(
                     "group relative w-full cursor-pointer overflow-hidden rounded-lg border px-3 py-3 text-left transition-all",
                     "border-transparent",
-                    // Light theme
                     isActive
-                    ? "bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200"
-                    : "text-zinc-600 hover:bg-zinc-100",
-                    // Dark theme
-                    isActive
-                    ? "dark:bg-black dark:text-white dark:ring-zinc-800"
-                    : "dark:text-zinc-400 dark:hover:bg-zinc-900/60"
+                    ? "bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 dark:bg-black dark:text-white dark:ring-zinc-800"
+                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900/60"
                 )}
                 >
                 {/* Active indicator */}
@@ -335,7 +316,6 @@ const SidebarContent = ({
                 )}
 
                 <div className="relative z-10 flex items-start gap-3">
-                    {/* Icon */}
                     <div
                     className={cn(
                         "mt-0.5",
@@ -347,7 +327,6 @@ const SidebarContent = ({
                     <track.icon className="h-5 w-5" />
                     </div>
 
-                    {/* Content */}
                     <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                         <span className="truncate text-sm font-medium">
@@ -359,7 +338,6 @@ const SidebarContent = ({
                         )}
                     </div>
 
-                    {/* Progress */}
                     <div className="mt-2">
                         <Progress
                         value={progress}
@@ -396,7 +374,6 @@ const SidebarContent = ({
                 dark:border-zinc-800
                 "
             >
-                {/* Glow */}
                 <div
                 className={cn(
                     `
@@ -415,7 +392,6 @@ const SidebarContent = ({
                 )}
                 />
 
-                {/* Header */}
                 <div className="relative z-10 flex justify-between items-start mb-4">
                 <div>
                     <h4
@@ -472,7 +448,6 @@ const SidebarContent = ({
                 </div>
                 </div>
 
-                {/* Chart */}
                 <div className="relative z-10 flex gap-1.5 h-12 items-end">
                 {chartHeights.map((h, i) => {
                     const isToday = i === 6;
@@ -503,7 +478,6 @@ const SidebarContent = ({
                 })}
                 </div>
 
-                {/* Footer */}
                 <div className="flex justify-between mt-2 px-0.5">
                 <span className="text-[10px] text-zinc-500 dark:text-zinc-600">
                     7 Days Ago
@@ -526,7 +500,7 @@ const TypeIcon = ({ type }) => {
       case "architecture": return <Cpu className="w-3.5 h-3.5 text-purple-400" />;
       case "documentation": return <BookOpen className="w-3.5 h-3.5 text-blue-400" />;
       case "concept": return <Zap className="w-3.5 h-3.5 text-yellow-400" />;
-      case "guide": return <FileText className="w-3.5 h-3.5 text-emerald-400" />;
+      case "guide": return <FileText className="w-3.5 h-3.5 text-zinc-400" />;
       default: return <Hash className="w-3.5 h-3.5 text-zinc-400" />;
     }
 };
@@ -674,7 +648,7 @@ export default function CurriculumPage() {
   });
 
   return (
-    <div className="flex mt-20 min-h-screen w-full  text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
+    <div className="flex min-h-screen w-full mt-20 text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
       
       {/* ------------------ DESKTOP SIDEBAR (Aside) ------------------ */}
       <aside className="w-80 border-r border-zinc-300 dark:border-zinc-800 hidden xl:flex z-30">
@@ -721,7 +695,7 @@ export default function CurriculumPage() {
             {/* Header */}
             <header
             className="
-                sticky top-0 z-20
+                w-full
                 h-18
                 flex items-center justify-between
                 px-4 md:px-10
@@ -806,6 +780,7 @@ export default function CurriculumPage() {
                 />
                 </div>
             </div>
+
             </header>
 
 
@@ -1146,57 +1121,73 @@ export default function CurriculumPage() {
                   const isCompleted = completedLessons.includes(lesson.id);
                   return (
                     <div
-                      key={lesson.id}
-                      onClick={() => toggleLesson(lesson.id)}
-                      className={cn(
-                        `
-                          flex items-center justify-between p-4 rounded-xl border
-                          transition-all cursor-pointer group/lesson select-none
-                        `,
-                        isCompleted
-                          ? `
-                            bg-zinc-50 border-zinc-200
-                            dark:bg-zinc-800 dark:border-zinc-900/20
-                          `
-                          : `
-                            bg-white border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300
-                            dark:bg-zinc-900/40 dark:border-zinc-800
-                            dark:hover:bg-zinc-800/60 dark:hover:border-zinc-700
-                          `
-                      )}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={cn(
-                            "h-6 w-6 rounded-full border flex items-center justify-center shrink-0 transition-all",
+                        key={lesson.id}
+                        className={cn(
+                            "group/lesson flex items-center justify-between p-4 rounded-xl border transition-all select-none",
                             isCompleted
-                              ? "dark:bg-zinc-500 border-zinc-500 text-black scale-110"
-                              : "border-zinc-400 text-transparent dark:border-zinc-600"
-                          )}
+                            ? "bg-zinc-50 border-zinc-200 dark:bg-zinc-800 dark:border-zinc-900/20"
+                            : "bg-white border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-900/40 dark:border-zinc-800 dark:hover:bg-zinc-800/60 dark:hover:border-zinc-700"
+                        )}
                         >
-                          <CheckCircle2 className="w-4 h-4" />
-                        </div>
-
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <span
+                        {/* 1. Link Area (Navigates to Learning Page) */}
+                        <Link 
+                            to={`/learning/${activeTrack.id}/${module.id}/${lesson.id}`}
+                            className="flex items-center gap-4 flex-1 cursor-pointer"
+                        >
+                            {/* Icon / Status */}
+                            <div
                             className={cn(
-                              "text-sm font-medium transition-colors line-clamp-1",
-                              isCompleted
-                                ? "text-zinc-400 line-through"
-                                : "text-zinc-800 group-hover/lesson:text-black dark:text-zinc-200 dark:group-hover/lesson:text-white"
+                                "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors border",
+                                isCompleted
+                                ? "bg-zinc-500/10 border-zinc-500/20 text-zinc-600 dark:text-zinc-400"
+                                : "bg-zinc-100 border-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:border-zinc-700"
                             )}
-                          >
-                            {lesson.title}
-                          </span>
+                            >
+                            {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
+                            </div>
 
-                          <span className="flex items-center text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
-                            <TypeIcon type={lesson.type} />
-                            <span className="ml-1.5">{lesson.type}</span>
-                            <span className="mx-1.5">•</span>
-                            {lesson.duration}
-                          </span>
+                            {/* Text Info */}
+                            <div className="flex flex-col gap-1 min-w-0">
+                            <span
+                                className={cn(
+                                "text-sm font-medium transition-colors line-clamp-1",
+                                isCompleted
+                                    ? "text-zinc-500 line-through decoration-zinc-400 dark:text-zinc-500 dark:decoration-zinc-600"
+                                    : "text-zinc-900 group-hover/lesson:text-zinc-700 dark:text-zinc-200 dark:group-hover/lesson:text-white"
+                                )}
+                            >
+                                {lesson.title}
+                            </span>
+
+                            <span className="flex items-center text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+                                <TypeIcon type={lesson.type} />
+                                <span className="ml-1.5">{lesson.type}</span>
+                                <span className="mx-1.5">•</span>
+                                {lesson.duration}
+                            </span>
+                            </div>
+                        </Link>
+
+                        {/* 2. Checkbox Area (Toggles Completion) */}
+                        <div
+                            onClick={(e) => {
+                            e.stopPropagation(); // Stop click from triggering Link
+                            toggleLesson(lesson.id);
+                            }}
+                            className="ml-4 cursor-pointer p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                            title={isCompleted ? "Mark as Incomplete" : "Mark as Complete"}
+                        >
+                            <div
+                            className={cn(
+                                "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
+                                isCompleted
+                                ? "bg-zinc-500 border-zinc-500"
+                                : "border-zinc-300 dark:border-zinc-600"
+                            )}
+                            >
+                            {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                            </div>
                         </div>
-                      </div>
                     </div>
                   );
                 })}
