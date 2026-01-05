@@ -53,7 +53,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 128, forks: 34 },
     featured: true,
     color: "from-purple-500 to-indigo-500",
-    image: "/public/project-1.png",
+    image: "/project-1.png",
     liveUrl: "https://revolyx.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Revolyx"
   },
@@ -68,7 +68,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 89, forks: 12 },
     featured: false,
     color: "from-zinc-500 to-teal-500",
-    image: "/public/project-2.png",
+    image: "/project-2.png",
     liveUrl: "https://vectorhue.vercel.app",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/VectorHue"
   },
@@ -83,7 +83,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 245, forks: 67 },
     featured: false,
     color: "from-orange-500 to-red-500",
-   image: "/public/project-3.png",
+   image: "/project-3.png",
     liveUrl: "https://numexis.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Numexis"
   },
@@ -98,7 +98,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 56, forks: 8 },
     featured: false,
     color: "from-blue-500 to-cyan-500",
-    image: "/public/project-4.png",
+    image: "/project-4.png",
     liveUrl: "https://taskaraa.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/TaskAraa"
   },
@@ -113,7 +113,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 92, forks: 21 },
     featured: false,
     color: "from-pink-500 to-rose-500",
-    image: "/public/project-5.png",
+    image: "/project-5.png",
     liveUrl: "https://svit-lms.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/SVIT-LMS"
   },
@@ -128,7 +128,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 45, forks: 5 },
     featured: false,
     color: "from-zinc-500 to-zinc-300",
-     image: "/public/project-6.png",
+     image: "/project-6.png",
     liveUrl: "https://recrutis.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Recrutis"
   },
@@ -143,7 +143,7 @@ const SHOWCASE_DATA = [
     stats: { stars: 45, forks: 5 },
     featured: false,
       color: "from-pink-500 to-rose-500",
-     image: "/public/project-7.png",
+     image: "/project-7.png",
     liveUrl: "https://climetrik.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Recrutis"
   }
