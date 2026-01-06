@@ -466,7 +466,1873 @@ Now \`key:Cmd+Opt+C\` can toggle the console. Also, note that the new top menu i
 Now we have the environment ready. In the next section, we'll get down to JavaScript.
 
   `
+},
+{
+  id: "js-5",
+  title: "Hello World",
+  content: `
+# Hello, world!
+
+This part of the tutorial is about core JavaScript, the language itself.
+
+But we need a working environment to run our scripts and, since this book is online, the browser is a good choice. We'll keep the amount of browser-specific commands (like \`alert\`) to a minimum so that you don't spend time on them if you plan to concentrate on another environment (like Node.js). We'll focus on JavaScript in the browser in the [next part](/ui) of the tutorial.
+
+So first, let's see how we attach a script to a webpage. For server-side environments (like Node.js), you can execute the script with a command like \`"node my.js"\`.
+
+## The "script" tag
+
+JavaScript programs can be inserted almost anywhere into an HTML document using the \`<script>\` tag.
+
+For instance:
+
+\`\`\`html
+<!DOCTYPE HTML>
+<html>
+
+<body>
+
+  <p>Before the script...</p>
+
+  <script>
+    alert( 'Hello, world!' );
+  </script>
+
+  <p>...After the script.</p>
+
+</body>
+
+</html>
+\`\`\`
+
+The \`<script>\` tag contains JavaScript code which is automatically executed when the browser processes the tag.
+
+## Modern markup
+
+The \`<script>\` tag has a few attributes that are rarely used nowadays but can still be found in old code:
+
+**The \`type\` attribute: \`<script type=...>\`**
+The old HTML standard, HTML4, required a script to have a \`type\`. Usually it was \`type="text/javascript"\`. It's not required anymore. Also, the modern HTML standard totally changed the meaning of this attribute. Now, it can be used for JavaScript modules. But that's an advanced topic, we'll talk about modules in another part of the tutorial.
+
+**The \`language\` attribute: \`<script language=...>\`**
+This attribute was meant to show the language of the script. This attribute no longer makes sense because JavaScript is the default language. There is no need to use it.
+
+**Comments before and after scripts**
+In really ancient books and guides, you may find comments inside \`<script>\` tags, like this:
+
+\`\`\`html
+<script type="text/javascript"></script>
+\`\`\`
+
+This trick isn't used in modern JavaScript. These comments hide JavaScript code from old browsers that didn't know how to process the \`<script>\` tag. Since browsers released in the last 15 years don't have this issue, this kind of comment can help you identify really old code.
+
+## External scripts
+
+If we have a lot of JavaScript code, we can put it into a separate file.
+
+Script files are attached to HTML with the \`src\` attribute:
+
+\`\`\`html
+<script src="/path/to/script.js"></script>
+\`\`\`
+
+Here, \`/path/to/script.js\` is an absolute path to the script from the site root. One can also provide a relative path from the current page. For instance, \`src="script.js"\`, just like \`src="./script.js"\`, would mean a file \`"script.js"\` in the current folder.
+
+We can give a full URL as well. For instance:
+
+\`\`\`html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.js"></script>
+\`\`\`
+
+To attach several scripts, use multiple tags:
+
+\`\`\`html
+<script src="/js/script1.js"></script>
+<script src="/js/script2.js"></script>
+…
+\`\`\`
+
+> **Separate files benefits**
+>
+> As a rule, only the simplest scripts are put into HTML. More complex ones reside in separate files.
+>
+> The benefit of a separate file is that the browser will download it and store it in its [cache](https://en.wikipedia.org/wiki/Web_cache).
+>
+> Other pages that reference the same script will take it from the cache instead of downloading it, so the file is actually downloaded only once.
+>
+> That reduces traffic and makes pages faster.
+
+> **Warning: If \`src\` is set, the script content is ignored.**
+>
+> A single \`<script>\` tag can't have both the \`src\` attribute and code inside.
+>
+> This won't work:
+>
+> \`\`\`html
+> <script src="file.js">
+>   alert(1); // the content is ignored, because src is set
+> </script>
+> \`\`\`
+>
+> We must choose either an external \`<script src="…">\` or a regular \`<script>\` with code.
+>
+> The example above can be split into two scripts to work:
+>
+> \`\`\`html
+> <script src="file.js"></script>
+> <script>
+>   alert(1);
+> </script>
+> \`\`\`
+
+## Summary
+
+- We can use a \`<script>\` tag to add JavaScript code to a page.
+- The \`type\` and \`language\` attributes are not required.
+- A script in an external file can be inserted with \`<script src="path/to/script.js"></script>\`.
+
+There is much more to learn about browser scripts and their interaction with the webpage. But let's keep in mind that this part of the tutorial is devoted to the JavaScript language, so we shouldn't distract ourselves with browser-specific implementations of it. We'll be using the browser as a way to run JavaScript, which is very convenient for online reading, but only one of many.
+`
+},
+{
+  id: "js-6",
+  title: "Code Structure",
+  content: `
+# Code Structure
+
+The first step in mastering JavaScript is understanding its fundamental building blocks.
+
+## Statements
+
+Statements are syntax constructs and commands that perform actions. They are the "sentences" of the language.
+
+We've already seen a statement:
+\`\`\`javascript
+alert('Hello, world!');
+\`\`\`
+
+We can have as many statements in our code as we want. Statements can be separated with a semicolon.
+
+\`\`\`javascript
+alert('Hello'); alert('World');
+\`\`\`
+
+**Best Practice:** usually, statements are written on separate lines to maximize readability:
+
+\`\`\`javascript
+alert('Hello');
+alert('World');
+\`\`\`
+
+## Semicolons
+
+A semicolon may be omitted in most cases when a line break exists. JavaScript interprets the line break as an "implicit" semicolon. This is called **Automatic Semicolon Insertion (ASI)**.
+
+However, "in most cases" does not mean "always".
+
+### The Trap: Implicit Insertion Failure
+There are situations where JavaScript fails to assume a semicolon where it is really needed, leading to bugs that are difficult to trace.
+
+Consider this error scenario involving square brackets \`[]\`:
+
+\`\`\`javascript
+// ❌ This code throws an error
+alert("Hello")
+
+[1, 2].forEach(alert);
+\`\`\`
+
+**Why does this fail?**
+Because JavaScript does not assume a semicolon before square brackets. The engine treats the code as a single statement:
+
+\`\`\`javascript
+// How the engine reads it:
+alert("Hello")[1, 2].forEach(alert);
+\`\`\`
+
+It tries to treat the result of \`alert("Hello")\` as an array/object and access index \`[1, 2]\` of it, which is invalid.
+
+> **Production Rule:**
+> We recommend **always** putting semicolons between statements, even if they are separated by newlines. While it is possible to rely on ASI, explicit semicolons are safer and standard in professional codebases.
+
+## Comments
+
+As programs grow in complexity, it becomes necessary to add *comments* to describe the logic. Comments are completely ignored by the JavaScript engine; they exist solely for developers.
+
+### Single-line Comments
+Start with two forward slashes \`//\`. The rest of the line is a comment.
+
+\`\`\`javascript
+// This comment occupies a line of its own
+alert('Hello');
+
+alert('World'); // This comment follows the statement
+\`\`\`
+
+### Multiline Comments
+Start with \`/*\` and end with \`*/\`.
+
+\`\`\`javascript
+/* An example with two messages.
+This is a multiline comment.
+*/
+alert('Hello');
+alert('World');
+\`\`\`
+
+> **Pro Tip: Hotkeys**
+> In most editors (VS Code, WebStorm), you can toggle comments quickly:
+> * **Win/Linux:** \`Ctrl + /\`
+> * **Mac:** \`Cmd + /\`
+
+> **Warning: Nested Comments**
+> Nested multiline comments are not supported and will cause an error.
+>
+> \`\`\`javascript
+> /*
+>   /* nested comment ?!? */
+> */
+> alert( 'World' ); // Error
+> \`\`\`
+
+**Note on Production:**
+Don't hesitate to comment your code. While they add bytes to the file size, modern build tools (minifiers) remove all comments before publishing the code to production, so there is no performance penalty.
+`
+},
+{
+  id: "js-7",
+  title: "Modern Mode: \"use strict\"",
+  content: `
+# The Modern Mode: "use strict"
+
+For a long time, JavaScript evolved without breaking compatibility. New features were added, but old functionality remained unchanged. While this prevented legacy code from breaking, it meant that mistakes or poor design decisions in the language's early days were stuck forever.
+
+This changed in 2009 with **ECMAScript 5 (ES5)**. It introduced new features and cleaned up the language. To maintain compatibility with old code, these modifications are *off by default*.
+
+You must explicitly enable them using the directive: \`"use strict"\`.
+
+## Enabling Strict Mode
+
+The directive looks like a string: \`"use strict"\` or \`'use strict'\`.
+
+When placed at the **top** of a script, the entire script executes in the "modern" way.
+
+\`\`\`javascript
+"use strict";
+
+// This code works the modern way
+const x = 5;
+\`\`\`
+
+You can also place it at the beginning of a specific function to enable strict mode only for that function, though global usage is more common.
+
+> **Critical Rule: Top-Level Placement**
+> Ensure that \`"use strict"\` is the very first statement in your script. If there is code (other than comments) before it, the directive is ignored.
+>
+> \`\`\`javascript
+> // ❌ Strict mode is NOT enabled here
+> alert("some code");
+> "use strict";
+> \`\`\`
+
+> **No Cancellation**
+> There is no \`"no use strict"\` directive. Once the engine enters strict mode, it cannot go back to the "old" mode for that scope.
+
+## Strict Mode in the Browser Console
+
+By default, the developer console in browsers does **not** use strict mode.
+
+To test strict mode behavior in the console:
+
+1.  **Multi-line Input**: Press \`Shift+Enter\` to create a new line.
+2.  **Add Directive**: Type \`'use strict';\` at the top.
+3.  **Run**:
+    \`\`\`javascript
+    'use strict';
+    // ... your code
+    \`\`\`
+
+If that fails (in older browsers), use an IIFE (Immediately Invoked Function Expression) wrapper:
+
+\`\`\`javascript
+(function() {
+  'use strict';
+  // ... your code ...
+})()
+\`\`\`
+
+## Do We Always Need It?
+
+You might think you should add \`"use strict"\` to every file forever. However, modern JavaScript architecture handles this for you.
+
+**Modules and Classes enable strict mode automatically.**
+
+If you are using modern build tools (Vite, Webpack), TypeScript, or native ES Modules (\`<script type="module">\`), strict mode is already enabled by default. You do not need to add the string manually.
+
+**Summary:**
+* For legacy scripts or simple HTML prototypes: **Add \`"use strict";\`**.
+* For modern application development (Modules/Classes): **It's automatic.**
+`
+},
+{
+  id: "js-8",
+  title: "Variables & Storage",
+  content: `
+# Variables: Storing Data
+
+Most applications need to work with information—goods in a shop, messages in a chat, or user profiles. **Variables** are the named storage units for this data.
+
+## 1. Declaring Variables
+
+To create a variable in modern JavaScript, we use the \`let\` keyword.
+
+\`\`\`javascript
+let message; // Declaration
+message = 'Hello'; // Assignment
+\`\`\`
+
+We can combine these steps into a single line, which is the standard practice:
+
+\`\`\`javascript
+let message = 'Hello!';
+alert(message); // Output: Hello!
+\`\`\`
+
+### Multiple Variables
+You can declare multiple variables in one line, but for **readability**, it is strongly recommended to declare each on its own line.
+
+\`\`\`javascript
+// ❌ Avoid (Hard to read)
+let user = 'John', age = 25, message = 'Hello';
+
+// ✅ Preferred (Clean)
+let user = 'John';
+let age = 25;
+let message = 'Hello';
+\`\`\`
+
+## 2. A Real-Life Analogy
+
+Imagine a variable as a **box** for data with a unique sticker name on it.
+
+
+
+You can put any value in the box, and you can change it as many times as you want. When you change the value, the old data is removed and replaced.
+
+\`\`\`javascript
+let message;
+message = 'Hello!';
+message = 'World!'; // Old value 'Hello!' is discarded
+\`\`\`
+
+> **Critical Rule: Declaration**
+> A variable should be declared **only once** in a scope. Repeating \`let\` triggers an error.
+> \`\`\`javascript
+> let message = "This";
+> let message = "That"; // ❌ SyntaxError: 'message' has already been declared
+> \`\`\`
+
+## 3. Constants (\`const\`)
+
+To declare a variable that cannot be reassigned, use \`const\`.
+
+\`\`\`javascript
+const myBirthday = '18.04.1982';
+myBirthday = '01.01.2001'; // ❌ TypeError: Assignment to constant variable.
+\`\`\`
+
+### Uppercase Constants
+There is a widespread practice to use uppercase names for **hard-coded** values known prior to execution.
+
+\`\`\`javascript
+const COLOR_RED = "#F00";
+const COLOR_GREEN = "#0F0";
+
+let color = COLOR_RED;
+\`\`\`
+
+* **Capital-named constants**: Used for values known *before* execution (aliases).
+* **CamelCase constants**: Used for values calculated at *runtime* that won't change (e.g., \`const pageLoadTime = ...\`).
+
+## 4. Legacy: \`var\`
+
+In older scripts, you will see \`var\` instead of \`let\`.
+
+\`\`\`javascript
+var message = 'Hello';
+\`\`\`
+
+**Production Rule**: Do not use \`var\`.
+It has subtle scoping differences (hoisting, no block scope) that lead to bugs. Modern development uses \`let\` and \`const\` exclusively.
+
+## 5. Variable Naming Rules
+
+JavaScript has strict rules and conventions for naming variables.
+
+**The Rules:**
+1.  Must contain only letters, digits, \`$\`, or \`_\`.
+2.  Must **not** start with a digit.
+3.  **Reserved words** (like \`let\`, \`class\`, \`return\`) cannot be used.
+
+**The Conventions:**
+* **CamelCase**: \`userName\`, \`shoppingCart\`.
+* **Descriptive**: \`currentUser\` is better than \`u\`. \`shoppingCart\` is better than \`data\`.
+
+> **Best Practice: Naming**
+> Variable naming is a skill. A variable name should clearly describe the data it stores.
+> * ❌ \`let a = 10;\`
+> * ✅ \`let maxRetries = 10;\`
+`
+},
+{
+  id: "js-9",
+  title: "Data Types",
+  content: `
+# Data Types
+
+Every value in JavaScript belongs to a specific type. JavaScript is a **dynamically typed** language, which means a variable is not bound to a specific data type; it can hold a string now and a number later.
+
+\`\`\`javascript
+let message = "hello"; // String
+message = 123456;      // Number (No error)
+\`\`\`
+
+There are **8 basic data types** in JavaScript.
+
+## 1. Number
+
+The \`number\` type represents both integers and floating-point numbers.
+
+\`\`\`javascript
+let n = 123;
+n = 12.345;
+\`\`\`
+
+### Special Numeric Values
+* **Infinity**: Represents the mathematical infinity (∞). Example: \`1 / 0\`.
+* **NaN** (Not a Number): Represents a computational error. It is "sticky"—any operation with \`NaN\` results in \`NaN\`.
+
+\`\`\`javascript
+alert( "not a number" / 2 ); // NaN
+alert( NaN + 1 ); // NaN
+\`\`\`
+
+## 2. BigInt
+
+For integers larger than the safe limit \`±(2^53-1)\` (approx. 9 quadrillion), regular numbers lose precision. \`BigInt\` was added to handle integers of arbitrary length.
+
+A \`BigInt\` is created by appending \`n\` to the end of an integer.
+
+\`\`\`javascript
+const bigInt = 1234567890123456789012345678901234567890n;
+\`\`\`
+
+## 3. String
+
+A string must be surrounded by quotes. JavaScript supports three types:
+
+1.  **Double quotes**: \`"Hello"\`
+2.  **Single quotes**: \`'Hello'\`
+3.  **Backticks**: \`\` \`Hello\` \`\`
+
+Double and single quotes are functionally identical. **Backticks** are special—they allow "template literals" to embed variables and expressions.
+
+\`\`\`javascript
+let name = "John";
+
+// Embed variable
+alert( \`Hello, \${name}!\` ); // Hello, John!
+
+// Embed expression
+alert( \`The result is \${1 + 2}\` ); // The result is 3
+\`\`\`
+
+## 4. Boolean
+
+Represents logical values: \`true\` and \`false\`.
+
+\`\`\`javascript
+let isGreater = 4 > 1; // true
+let checked = false;
+\`\`\`
+
+## 5. The \`null\` Value
+
+\`null\` is a special type that contains only the value \`null\`.
+In JavaScript, it does **not** mean a "null pointer" like in C++. It represents "nothing", "empty", or "value unknown".
+
+\`\`\`javascript
+let age = null; // Age is currently unknown
+\`\`\`
+
+## 6. The \`undefined\` Value
+
+\`undefined\` is another special type containing only \`undefined\`.
+It means "value is not assigned". If a variable is declared but not initialized, its value is \`undefined\`.
+
+\`\`\`javascript
+let age;
+alert(age); // undefined
+\`\`\`
+
+> **Best Practice**:
+> Use \`null\` to explicitly assign an "empty" value.
+> Leave \`undefined\` for the engine to indicate an unassigned state.
+
+## 7. Objects and Symbols
+
+* **Object**: The only non-primitive type. Used to store collections of data and complex entities.
+* **Symbol**: Used to create unique identifiers for object properties.
+
+## 8. The \`typeof\` Operator
+
+The \`typeof\` operator returns the type of the operand as a string.
+
+\`\`\`javascript
+typeof undefined // "undefined"
+typeof 0         // "number"
+typeof 10n       // "bigint"
+typeof true      // "boolean"
+typeof "foo"     // "string"
+typeof Symbol("id") // "symbol"
+typeof Math      // "object"
+typeof null      // "object" (Legacy Error)
+typeof alert     // "function" (Legacy Behavior)
+\`\`\`
+
+> **Legacy Quirks:**
+> 1. \`typeof null\` returns \`"object"\`. This is a known bug in JavaScript kept for backward compatibility. \`null\` is **not** an object.
+> 2. \`typeof function\` returns \`"function"\`. Technically functions are objects, but \`typeof\` treats them uniquely, which is often convenient.
+
+
+
+## Summary
+
+JavaScript has 8 types:
+1.  **Number** (Floats & Integers)
+2.  **BigInt** (Arbitrary precision integers)
+3.  **String** (Text)
+4.  **Boolean** (Logical)
+5.  **Null** (Empty/Unknown)
+6.  **Undefined** (Unassigned)
+7.  **Symbol** (Unique IDs)
+8.  **Object** (Complex data structures)
+`
+},
+{
+  id: "js-10",
+  title: "Browser Interaction",
+  content: `
+# Browser Interaction
+
+JavaScript provides three built-in functions to interact with the user via the browser interface: \`alert\`, \`prompt\`, and \`confirm\`.
+
+These methods create **Modal Windows**. A modal window halts the internal execution of the script and prevents the user from interacting with the rest of the page until the window is dismissed.
+
+
+
+## 1. Alert
+
+The simplest form of interaction. It displays a message and waits for the user to press "OK".
+
+\`\`\`javascript
+alert("Hello");
+\`\`\`
+
+## 2. Prompt
+
+The \`prompt\` function accepts two arguments and asks the user for textual input.
+
+\`\`\`javascript
+const result = prompt(title, [default]);
+\`\`\`
+
+* **title**: The text to show the visitor.
+* **default** (optional): The initial value for the input field.
+
+**Return Behavior:**
+* **String**: If the user types text and clicks OK.
+* **null**: If the user clicks Cancel or presses \`Esc\`.
+
+\`\`\`javascript
+let age = prompt('How old are you?', '18');
+
+alert(\`You are \${age} years old!\`);
+\`\`\`
+
+> **Best Practice: Default Value**
+> In older browsers (IE), omitting the second argument could result in the text "undefined" appearing in the input. To be safe, always supply an empty string \`''\` if no default is needed.
+> \`\`\`javascript
+> prompt("Test", ''); // Safe cross-browser
+> \`\`\`
+
+## 3. Confirm
+
+The \`confirm\` function shows a modal with a question and two buttons: **OK** and **Cancel**.
+
+\`\`\`javascript
+const isBoss = confirm("Are you the boss?");
+
+alert(isBoss); // true if OK is pressed, false otherwise
+\`\`\`
+
+## 4. Engineering Limitations
+
+While useful for debugging or simple internal tools, these methods are rarely used in modern production applications (like React/Vue apps) for specific reasons:
+
+1.  **Blocking Nature**: They pause the entire script execution. This can freeze animations or background processes.
+2.  **Unstyleable**: You cannot change their color, font, or position. They look different on every OS/Browser.
+3.  **UX Friction**: They disrupt the user flow aggressively.
+
+**Modern Alternative**:
+Professional applications use **Non-blocking Modals** (HTML/CSS overlays) or libraries like \`Radix UI Dialog\` or \`SweetAlert\`, which allow full styling and do not freeze the JavaScript thread.
+
+## Summary
+
+| Method | Description | Returns |
+| :--- | :--- | :--- |
+| \`alert\` | Shows a message. | \`undefined\` |
+| \`prompt\` | Asks for text input. | String or \`null\` |
+| \`confirm\` | Asks a Yes/No question. | \`true\` or \`false\` |
+`
+},
+{
+  id: "js-11",
+  title: "Type Conversions",
+  content: `
+# Type Conversions
+
+In JavaScript, operators and functions often convert values to the required type automatically. This is called **Implicit Conversion** (or Type Coercion). However, we often need to manually convert values, known as **Explicit Conversion**.
+
+## 1. String Conversion
+
+Happens when we need the text form of a value (e.g., \`alert()\`).
+To convert manually, use the \`String()\` function.
+
+\`\`\`javascript
+let value = true;
+value = String(value); // "true"
+\`\`\`
+
+The conversion is intuitive:
+* \`false\` -> \`"false"\`
+* \`null\` -> \`"null"\`
+* \`undefined\` -> \`"undefined"\`
+
+## 2. Numeric Conversion
+
+Happens in mathematical functions and expressions.
+
+\`\`\`javascript
+alert("6" / "2"); // 3 (Strings converted to numbers)
+\`\`\`
+
+To convert manually, use the \`Number()\` function.
+
+\`\`\`javascript
+let num = Number("123"); // 123
+\`\`\`
+
+### Conversion Rules Table
+
+| Value | Becomes... |
+| :--- | :--- |
+| \`undefined\` | \`NaN\` |
+| \`null\` | \`0\` |
+| \`true\` | \`1\` |
+| \`false\` | \`0\` |
+| \`string\` | Trims whitespace. Empty string -> \`0\`. Invalid chars -> \`NaN\`. |
+
+> **Critical Distinction**:
+> * \`Number(null)\` is \`0\`.
+> * \`Number(undefined)\` is \`NaN\`.
+
+## 3. Boolean Conversion
+
+Happens in logical operations (if statements) or manually via \`Boolean()\`.
+
+**The Rule of "Falsy" Values:**
+The following values become \`false\`. **Everything else** becomes \`true\`.
+
+1.  \`0\`
+2.  \`""\` (Empty string)
+3.  \`null\`
+4.  \`undefined\`
+5.  \`NaN\`
+
+\`\`\`javascript
+alert(Boolean("hello")); // true
+alert(Boolean(""));      // false
+\`\`\`
+
+> **The PHP Trap**
+> In JavaScript, the string \`"0"\` is **true** because it is a non-empty string.
+> \`\`\`javascript
+> Boolean("0"); // true
+> Boolean(" "); // true (space is a character)
+> \`\`\`
+
+
+
+## Summary
+
+| Type | Function | Key Exception to Remember |
+| :--- | :--- | :--- |
+| **String** | \`String(val)\` | Everything is intuitive. |
+| **Number** | \`Number(val)\` | \`undefined\` -> \`NaN\`, but \`null\` -> \`0\`. |
+| **Boolean** | \`Boolean(val)\` | \`"0"\` is \`true\`. Only empty string \`""\` is \`false\`. |
+`
+},
+{
+  id: "js-12",
+  title: "Basic Operators & Maths",
+  content: `
+# Basic Operators & Maths
+
+In JavaScript, operators go beyond school arithmetic. Understanding how the engine handles data types during operations is critical for preventing logic bugs.
+
+## 1. Terminology
+
+* **Operand**: The value the operator applies to (e.g., in \`5 * 2\`, 5 and 2 are operands).
+* **Unary**: Applies to **one** operand (e.g., \`-x\` reverses the sign).
+* **Binary**: Applies to **two** operands (e.g., \`y - x\`).
+
+## 2. Arithmetic Operators
+
+Standard math operations are supported:
+* Addition \`+\`
+* Subtraction \`-\`
+* Multiplication \`*\`
+* Division \`/\`
+* **Remainder \`%\`**: Not a percent. It is the remainder of integer division.
+* **Exponentiation \`**\`**: Raises power. \`2 ** 3\` is 8.
+
+\`\`\`javascript
+alert( 5 % 2 ); // 1
+alert( 2 ** 4 ); // 16
+\`\`\`
+
+## 3. String Concatenation (Binary +)
+
+The binary \`+\` is special. If **any** operand is a string, it converts the other to a string and concatenates (merges) them.
+
+\`\`\`javascript
+alert( '1' + 2 ); // "12"
+alert( 2 + '1' ); // "21"
+\`\`\`
+
+
+
+**Left-to-Right Evaluation Rule:**
+Operations execute sequentially.
+
+\`\`\`javascript
+// 1. (2 + 2) = 4 (Math)
+// 2. 4 + '1' = "41" (Concat)
+alert( 2 + 2 + '1' ); // "41"
+
+// 1. ('1' + 2) = "12" (Concat)
+// 2. "12" + 2 = "122" (Concat)
+alert( '1' + 2 + 2 ); // "122"
+\`\`\`
+
+> **Note**: Other operators (\`-\`, \`/\`, \`*\`) always convert strings to numbers.
+> \`alert( '6' / '2' ); // 3\`
+
+## 4. Numeric Conversion (Unary +)
+
+The unary plus (\`+\`) applied to a single value converts it to a number. It is a shorthand for \`Number()\`.
+
+\`\`\`javascript
+alert( +true );  // 1
+alert( +"" );    // 0
+alert( +"123" ); // 123
+\`\`\`
+
+It allows concise summation of string inputs:
+\`\`\`javascript
+let apples = "2";
+let oranges = "3";
+
+alert( +apples + +oranges ); // 5 (Math)
+\`\`\`
+
+## 5. Assignment & In-Place Modification
+
+Assignment \`=\` is an operator that **returns a value**.
+
+\`\`\`javascript
+let a = 1;
+let b = 2;
+let c = 3 - (a = b + 1); // a becomes 3, returns 3. c = 3 - 3 = 0.
+\`\`\`
+
+**Modify-in-place:**
+Shorthand operators exist for common math.
+
+\`\`\`javascript
+let n = 2;
+n += 5; // n = 7 (n = n + 5)
+n *= 2; // n = 14 (n = n * 2)
+\`\`\`
+
+## 6. Increment / Decrement
+
+Used to increase/decrease a variable by 1.
+* **Prefix (\`++value\`)**: Returns the **new** value.
+* **Postfix (\`value++\`)**: Returns the **old** value (before increment).
+
+\`\`\`javascript
+let counter = 1;
+let a = ++counter; // a is 2
+
+let counter2 = 1;
+let b = counter2++; // b is 1 (counter2 becomes 2 AFTER this line)
+\`\`\`
+
+## 7. The Comma Operator
+
+One of the rarest operators. It evaluates multiple expressions but **only returns the result of the last one**.
+
+\`\`\`javascript
+// (1+2) runs, result ignored. (3+4) runs, result returned.
+let a = (1 + 2, 3 + 4); 
+alert(a); // 7
+\`\`\`
+
+> **Engineering Tip:**
+> Avoid the comma operator in standard logic. It is mostly found in complex framework internals or minified code.
+
+## Summary of Priorities (Precedence)
+
+1.  Parentheses \`()\`: Override everything.
+2.  Unary Operators (\`++\`, \`--\`, \`!\`, unary \`+\`)
+3.  Exponentiation \`**\`
+4.  Multiplication/Division \`*\`, \`/\`
+5.  Addition/Subtraction \`+\`, \`-\`
+6.  Assignment \`=\`
+7.  Comma \`,\`
+`
+},
+{
+  id: "js-13",
+  title: "Comparisons",
+  content: `
+# Comparisons
+
+Comparison operators in JavaScript return a **Boolean** value (\`true\` or \`false\`).
+
+## 1. Basic Operators
+
+* **Greater/Less**: \`a > b\`, \`a < b\`
+* **Greater/Less or Equal**: \`a >= b\`, \`a <= b\`
+* **Equals**: \`a == b\` (Loose equality)
+* **Not Equals**: \`a != b\`
+
+\`\`\`javascript
+alert( 2 > 1 );  // true
+alert( 2 == 1 ); // false
+\`\`\`
+
+## 2. String Comparison
+
+Strings are compared letter-by-letter in "dictionary" (lexicographical) order.
+
+\`\`\`javascript
+alert( 'Z' > 'A' ); // true
+alert( 'Glow' > 'Glee' ); // true ('o' is greater than 'e')
+\`\`\`
+
+> **Note**: Case matters. Lowercase letters are "greater" than uppercase in Unicode. \`'a' > 'A'\` is true.
+
+## 3. Comparison of Different Types
+
+When types differ, JavaScript converts values to **Numbers**.
+
+\`\`\`javascript
+alert( '2' > 1 ); // true (String '2' becomes number 2)
+alert( '01' == 1 ); // true
+alert( true == 1 ); // true
+alert( false == 0 ); // true
+\`\`\`
+
+## 4. Strict Equality (\`===\`)
+
+The regular equality operator \`==\` has a flaw: it cannot distinguish \`0\` from \`false\`.
+
+\`\`\`javascript
+alert( 0 == false ); // true (Both become 0)
+\`\`\`
+
+**The Fix: Strict Equality (\`===\`)**
+Checks equality **without** type conversion. If types differ, it returns \`false\`.
+
+\`\`\`javascript
+alert( 0 === false ); // false (Number vs Boolean)
+\`\`\`
+
+
+
+## 5. Null and Undefined Quirks
+
+This is a famous JavaScript interview topic.
+
+1.  **Strict Check**: \`null === undefined\` is **false**.
+2.  **Loose Check**: \`null == undefined\` is **true**. They are a "couple" and equal no other value.
+
+### The Trap: Null vs 0
+\`\`\`javascript
+alert( null > 0 );  // false
+alert( null == 0 ); // false
+alert( null >= 0 ); // true
+\`\`\`
+
+**Why?**
+* **Equality (\`==\`)**: \`null\` only equals \`undefined\`. It does **not** convert to a number.
+* **Comparisons (\`>\`, \`<\`)**: \`null\` converts to \`0\`. So \`null >= 0\` (0 >= 0) is true.
+
+## Summary
+
+* Always use **Strict Equality** (\`===\`) to avoid type conversion bugs.
+* Strings compare alphabetically (lexicographically).
+* \`null\` and \`undefined\` equal each other loosely (\`==\`), but nothing else.
+* Be careful comparing \`null\` or \`undefined\` with numbers (operators like \`>\` or \`<\` convert them, but \`==\` does not).
+`
+},
+{
+  id: "js-14",
+  title: "Conditional Branching",
+  content: `
+# Conditional Branching
+
+Conditional statements allow your code to perform different actions based on different inputs or states. This is the core of **Control Flow**.
+
+## 1. The \`if\` Statement
+
+The \`if(...)\` statement evaluates a condition. If the result converts to \`true\`, the block of code executes.
+
+
+
+[Image of if else statement flowchart]
+
+
+\`\`\`javascript
+const year = 2015;
+
+if (year === 2015) {
+  alert("Correct!");
 }
+\`\`\`
+
+**Boolean Conversion:**
+The condition is automatically converted to a boolean. Recall the **Falsy** values: \`0\`, \`""\`, \`null\`, \`undefined\`, \`NaN\`. Everything else is **Truthy**.
+
+> **Best Practice: Curly Braces**
+> Always wrap your code block in curly braces \`{}\`, even if it is a single line. This improves readability and prevents errors during refactoring.
+>
+> \`\`\`javascript
+> // ❌ Avoid
+> if (year === 2015) alert("Yes");
+>
+> // ✅ Preferred
+> if (year === 2015) {
+>   alert("Yes");
+> }
+> \`\`\`
+
+## 2. The \`else\` and \`else if\` Clauses
+
+* **\`else\`**: Executes if the condition is falsy.
+* **\`else if\`**: Tests a new condition if the previous one was falsy.
+
+\`\`\`javascript
+const year = 2024;
+
+if (year < 2015) {
+  alert('Too early...');
+} else if (year > 2015) {
+  alert('Too late');
+} else {
+  alert('Exactly!');
+}
+\`\`\`
+
+## 3. The Ternary Operator (\`?\`)
+
+The "Conditional Operator" (or Ternary) is the only JavaScript operator that takes three operands. It is primarily used for **conditional assignment**, not for controlling flow logic.
+
+
+
+**Syntax:**
+\`let result = condition ? valueIfTrue : valueIfFalse;\`
+
+\`\`\`javascript
+let age = 18;
+
+// Clean assignment
+let accessAllowed = (age > 18) ? true : false;
+\`\`\`
+
+### Chaining Ternaries
+You can chain them to mimic \`else if\`, though this can hurt readability if overused.
+
+\`\`\`javascript
+let message = (age < 3) ? 'Hi, baby!' :
+  (age < 18) ? 'Hello!' :
+  (age < 100) ? 'Greetings!' :
+  'What an unusual age!';
+\`\`\`
+
+## 4. Engineering Anti-Pattern: Ternary for Execution
+
+A common mistake is using the ternary operator as a replacement for \`if\` statements to "save lines" when not assigning a value.
+
+\`\`\`javascript
+// ❌ Bad Practice: Hard to scan vertically
+(company == 'Netscape') ? alert('Right!') : alert('Wrong.');
+
+// ✅ Good Practice: Clear intent
+if (company == 'Netscape') {
+  alert('Right!');
+} else {
+  alert('Wrong.');
+}
+\`\`\`
+
+> **The Rule of Thumb:**
+> * Use **Ternary (\`?\`)** when you need to **return a value** (assignment).
+> * Use **If/Else** when you need to **execute a code block** (branching logic).
+`
+},
+{
+  id: "js-15",
+  title: "Logical Operators",
+  content: `
+# Logical Operators
+
+JavaScript supports three primary logical operators: \`||\` (OR), \`&&\` (AND), and \`!\` (NOT).
+
+While traditional programming treats these strictly as Boolean manipulators, JavaScript treats them as **Value Selectors**. They can process values of any type and return values of any type.
+
+
+
+[Image of logical operators truth table]
+
+
+## 1. OR (\`||\`) - The Selector
+
+The "OR" operator finds the **first truthy value**.
+
+**The Algorithm:**
+1.  Evaluate operands from left to right.
+2.  Convert each to a boolean.
+3.  If \`true\`, stop and **return the original value** of that operand.
+4.  If all are \`false\`, return the **last** operand.
+
+
+
+\`\`\`javascript
+const result = value1 || value2 || value3;
+\`\`\`
+
+### Common Use Case: Default Values
+This behavior is frequently used to assign default values to variables.
+
+\`\`\`javascript
+const input = ""; // Falsy
+const user = input || "Anonymous"; // Selects "Anonymous"
+
+const port = process.env.PORT || 3000;
+\`\`\`
+
+> **Short-Circuit Evaluation**
+> If the first operand is truthy, the second operand is **never evaluated**.
+> \`\`\`javascript
+> true || alert("This will NOT run");
+> false || alert("This WILL run");
+> \`\`\`
+
+## 2. AND (\`&&\`) - The Guard
+
+The "AND" operator finds the **first falsy value**.
+
+**The Algorithm:**
+1.  Evaluate operands from left to right.
+2.  Convert each to a boolean.
+3.  If \`false\`, stop and **return the original value** of that operand.
+4.  If all are \`true\`, return the **last** operand.
+
+
+
+\`\`\`javascript
+// Returns the first falsy value (null), ignores the rest
+const result = 1 && null && 2; // null
+\`\`\`
+
+### Common Use Case: Guard Clauses
+The \`&&\` operator is often used to execute code only if a condition is met.
+
+\`\`\`javascript
+const isLoggedIn = true;
+const user = { name: "John" };
+
+// Only runs if isLoggedIn is truthy
+isLoggedIn && alert(\`Welcome, \${user.name}\`);
+\`\`\`
+
+> **Engineering Note: Don't abuse &&**
+> While \`condition && action()\` is shorter than an \`if\` statement, it makes code harder to read. Use it for rendering (like in React JSX) but prefer explicit \`if\` statements for complex business logic.
+
+## 3. NOT (\`!\`) - The Inverter
+
+The NOT operator accepts a single argument. It converts the value to a boolean and returns the **inverse**.
+
+\`\`\`javascript
+alert( !true ); // false
+alert( !0 );    // true (0 is falsy, inverse is true)
+\`\`\`
+
+### The Double Bang (\`!!\`)
+A common pattern to explicitly convert a value to a \`boolean\`.
+
+\`\`\`javascript
+const value = "Hello";
+const hasValue = !!value; // true
+\`\`\`
+
+## 4. Precedence
+
+The order of execution is critical when mixing operators.
+**Order:** \`!\` (Highest) > \`&&\` > \`||\` (Lowest).
+
+\`\`\`javascript
+// && runs before ||
+// Equivalent to: (a && b) || (c && d)
+if (a && b || c && d) { ... }
+\`\`\`
+
+## Summary
+
+| Operator | Logic | Returns |
+| :--- | :--- | :--- |
+| **\`||\` (OR)** | Finds first **Truthy** | The value itself (or last value) |
+| **\`&&\` (AND)** | Finds first **Falsy** | The value itself (or last value) |
+| **\`!\` (NOT)** | Inverts Boolean | Boolean (\`true\`/\`false\`) |
+`
+},
+{
+  id: "js-16",
+  title: "Nullish Coalescing Operator '??'",
+  content: `
+# Nullish Coalescing Operator '??'
+
+The **nullish coalescing operator** (\`??\`) is a modern JavaScript feature that provides a safe way to handle default values.
+
+It treats \`null\` and \`undefined\` as "undefined" values, while everything else (including \`0\` and \`false\`) is considered "defined".
+
+**The Logic:**
+\`result = a ?? b\`
+
+* If \`a\` is **defined** (not null/undefined), return \`a\`.
+* If \`a\` is **null** or **undefined**, return \`b\`.
+
+\`\`\`javascript
+const user = null;
+alert(user ?? "Anonymous"); // "Anonymous"
+
+const user2 = "John";
+alert(user2 ?? "Anonymous"); // "John"
+\`\`\`
+
+## 1. The Critical Difference: \`??\` vs \`||\`
+
+This is the most common interview question regarding this operator.
+
+* **OR (\`||\`)**: Returns the first **Truthy** value.
+* **Nullish (\`??\`)**: Returns the first **Defined** value.
+
+**The "Zero" Problem:**
+Imagine \`height = 0\`. In many apps, 0 is a valid number, not "empty".
+
+\`\`\`javascript
+let height = 0;
+
+// ❌ OR operator treats 0 as false
+alert(height || 100); // 100 (Wrong! We wanted 0)
+
+// ✅ Nullish operator treats 0 as defined
+alert(height ?? 100); // 0 (Correct)
+\`\`\`
+
+
+
+## 2. Precedence
+
+The precedence of \`??\` is low (similar to \`||\`). It executes **after** math operations like \`*\` or \`+\`.
+
+**Warning:** Always use parentheses when mixing with math.
+
+\`\`\`javascript
+let height = null;
+let width = null;
+
+// ❌ Wrong: 100 * width runs first
+// let area = height ?? 100 * width ?? 50;
+
+// ✅ Correct
+let area = (height ?? 100) * (width ?? 50); // 5000
+\`\`\`
+
+## 3. Safety Restriction
+
+JavaScript forbids mixing \`??\` directly with \`||\` or \`&&\` without parentheses. This prevents ambiguous logic errors.
+
+\`\`\`javascript
+// ❌ Syntax Error
+let x = 1 && 2 ?? 3;
+
+// ✅ Correct
+let x = (1 && 2) ?? 3;
+\`\`\`
+
+## Summary
+
+* Use \`??\` when you want to assign a default value **only** for \`null\` or \`undefined\`.
+* Use \`||\` when you want to handle all falsy values (like \`0\` or \`""\`).
+* Always use parentheses when mixing \`??\` with other logical or mathematical operators.
+`
+},
+{
+  id: "js-17",
+  title: "Loops: while and for",
+  content: `
+# Loops: Repeating Logic
+
+Loops are used to repeat a block of code multiple times.
+
+## 1. The \`while\` Loop
+
+The simplest loop. It runs **while** the condition is truthy.
+
+
+
+[Image of while loop flowchart]
+
+
+\`\`\`javascript
+let i = 0;
+while (i < 3) {
+  alert(i);
+  i++;
+}
+\`\`\`
+
+**Infinite Loops**: If you forget to update the condition (like \`i++\`), the loop will run forever and freeze the browser.
+
+## 2. The \`do..while\` Loop
+
+The condition is checked **after** the body executes.
+**Guarantee**: The loop body always runs **at least once**.
+
+\`\`\`javascript
+let i = 0;
+do {
+  alert(i);
+  i++;
+} while (i < 3);
+\`\`\`
+
+## 3. The \`for\` Loop
+
+The most commonly used loop for standard iteration.
+
+**Syntax:**
+\`for (begin; condition; step) { body }\`
+
+\`\`\`javascript
+for (let i = 0; i < 3; i++) {
+  alert(i);
+}
+\`\`\`
+
+### Execution Flow
+1.  **Begin**: \`let i = 0\` (Runs once)
+2.  **Condition**: \`i < 3\` (Checked before every iteration)
+3.  **Body**: \`alert(i)\` (Runs if condition is true)
+4.  **Step**: \`i++\` (Runs after body)
+
+
+
+## 4. Controlling Loops
+
+### \`break\`
+Stops the loop immediately.
+
+\`\`\`javascript
+while (true) {
+  let value = +prompt("Enter number", '');
+  if (!value) break; // Exits loop if input is empty
+}
+\`\`\`
+
+### \`continue\`
+Stops the **current iteration** and jumps to the next one (skips the rest of the body).
+
+\`\`\`javascript
+for (let i = 0; i < 10; i++) {
+  // If even, skip alert
+  if (i % 2 == 0) continue;
+  alert(i); // Shows 1, 3, 5...
+}
+\`\`\`
+
+## 5. Labels (Breaking Nested Loops)
+
+To break out of **multiple** nested loops at once, you need a **Label**.
+
+\`\`\`javascript
+outer: for (let i = 0; i < 3; i++) {
+  for (let j = 0; j < 3; j++) {
+    let input = prompt(\`Coords (\${i},\${j})\`, '');
+
+    // Breaks BOTH loops
+    if (!input) break outer;
+  }
+}
+alert('Done!');
+\`\`\`
+
+## Summary
+
+* **\`while\`**: Check -> Run.
+* **\`do..while\`**: Run -> Check (Runs at least once).
+* **\`for\`**: Complex configuration (Begin -> Condition -> Body -> Step).
+* **\`break\`**: Exits the loop.
+* **\`continue\`**: Skips current iteration.
+* **Labels**: Allow breaking out of nested loops.
+`
+},
+{
+  id: "js-18",
+  title: "The Switch Statement",
+  content: `
+# The Switch Statement
+
+A \`switch\` statement is an alternative to multiple \`if...else if\` checks. It provides a clearer, more descriptive syntax when comparing a single value against multiple potential variants.
+
+## 1. Syntax & Logic
+
+The \`switch\` evaluates an expression and tries to match its value against one or more \`case\` clauses.
+
+
+
+\`\`\`javascript
+switch(x) {
+  case 'value1':  // if (x === 'value1')
+    // code...
+    break;
+
+  case 'value2':  // if (x === 'value2')
+    // code...
+    break;
+
+  default:
+    // code...
+}
+\`\`\`
+
+**Key Behaviors:**
+1.  **Strict Equality**: The comparison uses \`===\`. A string \`"3"\` will *not* match a number \`3\`.
+2.  **Fallthrough**: Without a \`break\` statement, execution continues into the next case *regardless* of whether that case matches.
+3.  **Default**: Executes if no cases match (similar to \`else\`).
+
+## 2. The Importance of \`break\`
+
+If you omit \`break\`, the script ignores checks and executes subsequent cases until it hits a break or the end of the block.
+
+\`\`\`javascript
+let a = 2 + 2;
+
+switch (a) {
+  case 3:
+    alert( 'Too small' );
+  case 4:
+    alert( 'Exactly!' ); // Matches, starts here
+  case 5:
+    alert( 'Too big' ); // Runs because previous case had no break
+  default:
+    alert( "I don't know" ); // Runs as well
+}
+\`\`\`
+
+> **Engineering Tip:**
+> While "fallthrough" is sometimes a feature (see Grouping), unintentional fallthrough is a common source of bugs. Always verify your \`break\` statements.
+
+## 3. Grouping Cases
+
+You can utilize fallthrough to group cases that share the same logic.
+
+\`\`\`javascript
+let day = "Saturday";
+
+switch (day) {
+  case "Saturday":
+  case "Sunday":
+    alert("It's the weekend!");
+    break;
+  case "Monday":
+    alert("Work day.");
+    break;
+}
+\`\`\`
+
+## 4. Expressions in Cases
+
+Both the switch statement and the case values can be dynamic expressions, not just constants.
+
+\`\`\`javascript
+let a = "1";
+let b = 0;
+
+switch (+a) {
+  case b + 1:
+    alert("Math works!"); // This runs because 1 === 0 + 1
+    break;
+}
+\`\`\`
+
+## 5. Type Strictness Trap
+
+Because \`switch\` uses \`===\`, types must match exactly.
+
+\`\`\`javascript
+let arg = prompt("Enter 3"); // Returns string "3"
+
+switch (arg) {
+  case 3:
+    alert( 'Never executes!' ); // Number 3 !== String "3"
+    break;
+  case '3':
+    alert( 'Executes!' );
+    break;
+}
+\`\`\`
+
+## Summary
+
+* Use \`switch\` for checking a single value against many constants.
+* Always remember \`break\` unless you explicitly want fallthrough.
+* Comparisons are strict (\`===\`); type matters.
+`
+},
+{
+  id: "js-19",
+  title: "Functions",
+  content: `
+# Functions
+
+Functions are the main building blocks of the program, allowing code reuse.
+
+
+
+## 1. Function Declaration
+
+The standard way to define a function:
+
+\`\`\`javascript
+function showMessage() {
+  alert('Hello everyone!');
+}
+
+showMessage(); // Calling the function
+\`\`\`
+
+## 2. Variables Scope
+
+* **Local Variables**: Declared *inside* the function. Only visible inside.
+* **Outer Variables**: Declared *outside* the function. The function can access and modify them.
+
+**Shadowing:**
+If a variable inside the function has the same name as an outer one, the local one "shadows" (hides) the outer one.
+
+\`\`\`javascript
+let userName = 'John';
+
+function showMessage() {
+  let userName = "Bob"; // Local variable
+  alert(userName); // Bob
+}
+
+showMessage();
+alert(userName); // John (Outer remains unchanged)
+\`\`\`
+
+## 3. Parameters & Arguments
+
+* **Parameter**: The variable listed in the declaration (\`function sum(a, b)\`).
+* **Argument**: The actual value passed when called (\`sum(1, 2)\`).
+
+**Pass by Value:**
+Primitive parameters (strings, numbers) are passed as copies. Changing them inside the function does *not* affect the original variable.
+
+## 4. Default Parameters
+
+If an argument is missing, it becomes \`undefined\`. We can set defaults:
+
+\`\`\`javascript
+function showMessage(from, text = "no text given") {
+  alert(from + ": " + text);
+}
+
+showMessage("Ann"); // Ann: no text given
+\`\`\`
+
+## 5. Returning Values
+
+The \`return\` directive stops execution and returns a value to the caller.
+
+\`\`\`javascript
+function sum(a, b) {
+  return a + b;
+}
+
+let result = sum(1, 2); // 3
+\`\`\`
+
+> **Rule:** If a function does not return a value, it returns \`undefined\`.
+
+## 6. Naming Conventions
+
+Functions are actions, so names should be verbs.
+
+* \`get...\` – Return a value
+* \`calc...\` – Calculate something
+* \`create...\` – Create something
+* \`check...\` – Return boolean
+
+\`\`\`javascript
+// ✅ Good: Self-describing
+function checkPermission(user) { ... }
+
+// ❌ Bad: Ambiguous
+function user(u) { ... }
+\`\`\`
+
+## Summary
+
+* Functions structure code and prevent duplication.
+* Variables inside are local; variables outside are global/outer.
+* Parameters copy primitive values.
+* Always use \`return\` to output data.
+* Use descriptive, verb-based names (e.g., \`getUser\`).
+`
+},
+{
+  id: "js-20",
+  title: "Function Expressions",
+  content: `
+# Function Expressions
+
+In JavaScript, a function is not a magical structure; it is a special kind of **value**.
+
+## 1. Syntax
+
+We have two main ways to create functions:
+
+**Function Declaration:**
+\`\`\`javascript
+function sayHi() {
+  alert( "Hello" );
+}
+\`\`\`
+
+**Function Expression:**
+Here, we create a function and assign it to a variable, just like any other value.
+\`\`\`javascript
+let sayHi = function() {
+  alert( "Hello" );
+};
+\`\`\`
+
+> **Note**: A semicolon \`;\` is used at the end of a Function Expression because it is an assignment statement (\`let x = ...;\`).
+
+## 2. Functions are Values
+
+Because functions are values, we can:
+1.  **Print them**: \`alert(sayHi)\` shows the source code.
+2.  **Copy them**:
+
+\`\`\`javascript
+let func = sayHi; // Copies the reference
+func(); // Works!
+sayHi(); // Still works!
+\`\`\`
+
+
+
+## 3. Callback Functions
+
+A **Callback** is a function passed as an argument to another function, to be "called back" later.
+
+\`\`\`javascript
+function ask(question, yes, no) {
+  if (confirm(question)) yes();
+  else no();
+}
+
+// Usage with Anonymous Function Expressions
+ask(
+  "Do you agree?",
+  function() { alert("You agreed."); },
+  function() { alert("You canceled."); }
+);
+\`\`\`
+
+## 4. Declaration vs. Expression (The Interview Question)
+
+| Feature | Function Declaration | Function Expression |
+| :--- | :--- | :--- |
+| **Syntax** | \`function sum() {}\` | \`let sum = function() {}\` |
+| **Creation Time** | Created **before** code execution (Hoisted). | Created when execution reaches the line. |
+| **Visibility** | Can be called **before** definition. | Must be defined before calling. |
+| **Block Scope** | Visible only inside the block \`{...}\`. | Depends on the variable (\`let\`/\`var\`). |
+
+### The Hoisting Difference
+
+**Declaration (Works):**
+\`\`\`javascript
+sayHi("John"); // Works!
+
+function sayHi(name) {
+  alert(name);
+}
+\`\`\`
+
+**Expression (Fails):**
+\`\`\`javascript
+sayHi("John"); // Error!
+
+let sayHi = function(name) {
+  alert(name);
+};
+\`\`\`
+
+### The Block Scope Trap
+In strict mode, a Function Declaration inside an \`if\` block is not visible outside that block. To conditionally define a function usable outside, use a Function Expression.
+
+\`\`\`javascript
+let welcome;
+
+if (age < 18) {
+  welcome = function() { alert("Hello!"); };
+} else {
+  welcome = function() { alert("Greetings!"); };
+}
+
+welcome(); // Works!
+\`\`\`
+
+## Summary
+
+* **Function Declarations** are hoisted (can call before defining) and preferred for readability.
+* **Function Expressions** are created when execution reaches them and are useful for conditional functions or callbacks.
+* Functions are **values**; they can be stored, copied, and passed around.
+`
+},
+{
+  id: "js-21",
+  title: "Arrow Functions Basics",
+  content: `
+# Arrow Functions
+
+Arrow functions (introduced in ES6) provide a concise syntax for writing function expressions. They are a staple in modern JavaScript development (especially in frameworks like React).
+
+
+
+## 1. Syntax Shorthand
+
+The arrow function \`=>\` replaces the \`function\` keyword.
+
+\`\`\`javascript
+// Traditional Function Expression
+let sum = function(a, b) {
+  return a + b;
+};
+
+// Arrow Function
+let sum = (a, b) => a + b;
+\`\`\`
+
+## 2. The Implicit Return
+
+One of the most powerful features is the **Implicit Return**.
+If the function body is a single expression, you can omit the curly braces \`{}\` and the \`return\` keyword. The result of the expression is returned automatically.
+
+\`\`\`javascript
+// Explicit Return (Block Body)
+const double = (n) => { return n * 2; };
+
+// Implicit Return (Concise Body)
+const double = n => n * 2;
+\`\`\`
+
+## 3. Parentheses Rules
+
+The syntax changes slightly based on the number of arguments:
+
+| Arguments | Syntax | Note |
+| :--- | :--- | :--- |
+| **Zero** | \`const func = () => ...\` | Parentheses are **mandatory**. |
+| **One** | \`const func = n => ...\` | Parentheses are **optional**. |
+| **Two+** | \`const func = (a, b) => ...\` | Parentheses are **mandatory**. |
+
+\`\`\`javascript
+// No arguments
+let sayHi = () => alert("Hello!");
+
+// One argument (no parens needed)
+let double = n => n * 2;
+
+// Two arguments
+let add = (a, b) => a + b;
+\`\`\`
+
+## 4. Multiline Arrow Functions
+
+If you need multiple statements (variables, loops, logic), you must use curly braces \`{}\`.
+
+**The Trap:**
+Once you open curly braces, the **implicit return is lost**. You must specify \`return\` explicitly.
+
+\`\`\`javascript
+// ❌ Returns undefined (Common Bug)
+const sum = (a, b) => {
+  a + b;
+};
+
+// ✅ Correct
+const sum = (a, b) => {
+  let result = a + b;
+  return result;
+};
+\`\`\`
+
+## Summary
+
+Arrow functions are the preferred syntax for simple one-liners and callbacks (like \`.map\` or \`.filter\`).
+
+* **Syntax**: \`(args) => expression\`.
+* **Concise**: Removes \`function\`, \`return\`, and \`{}\` for single expressions.
+* **Block Body**: If using \`{}\`, you must write \`return\`.
+`
+},
+{
+  id: "js-22",
+  title: "JavaScript Specials: A Recap",
+  content: `
+# JavaScript Specials: A Recap
+
+This chapter consolidates the fundamental features of JavaScript we've covered so far, focusing on subtle behaviors and best practices.
+
+## 1. Code Structure
+
+Statements are delimited with a semicolon. While JavaScript has **Automatic Semicolon Insertion (ASI)**, relying on it can lead to edge-case errors.
+
+\`\`\`javascript
+// ❌ Risky (ASI failure)
+alert("Error incoming")
+[1, 2].forEach(alert)
+
+// ✅ Safe (Explicit semicolons)
+alert("Safe");
+[1, 2].forEach(alert);
+\`\`\`
+
+## 2. Strict Mode
+
+To enable modern JavaScript features and fix legacy quirks, always start your scripts or functions with the directive:
+
+\`\`\`javascript
+'use strict';
+\`\`\`
+
+## 3. Variables & Data Types
+
+
+
+We declare variables using \`let\`, \`const\`, or (legacy) \`var\`. JavaScript is **dynamically typed**, meaning a variable can hold any data type.
+
+There are **8 Data Types**:
+1.  **Number**: Integers and floats.
+2.  **BigInt**: Arbitrary precision integers.
+3.  **String**: Text.
+4.  **Boolean**: \`true\` / \`false\`.
+5.  **Null**: Explicitly empty.
+6.  **Undefined**: Not assigned.
+7.  **Object**: Complex data structures.
+8.  **Symbol**: Unique identifiers.
+
+**The \`typeof\` Quirks:**
+\`\`\`javascript
+typeof null == "object" // ❌ Language Error (Historical)
+typeof function(){} == "function" // ✅ Special treatment
+\`\`\`
+
+## 4. Interaction (Modals)
+
+The browser provides three **blocking** (modal) functions:
+
+| Function | Usage | Returns |
+| :--- | :--- | :--- |
+| \`alert(msg)\` | Output info | \`undefined\` |
+| \`prompt(msg, default)\` | Ask for input | String or \`null\` |
+| \`confirm(msg)\` | Ask Yes/No | \`true\` / \`false\` |
+
+## 5. Operators
+
+* **Arithmetic**: \`+\`, \`-\`, \`*\`, \`/\`, \`%\` (remainder), \`**\` (power).
+    * *Note*: Binary \`+\` concatenates strings if one operand is a string.
+* **Logical**: \`&&\`, \`||\`, \`!\`.
+* **Nullish Coalescing (\`??\`)**: Returns the first defined value (not \`null\`/\`undefined\`).
+* **Comparison**:
+    * \`==\` (Loose): Converts types (e.g., \`0 == false\` is true).
+    * \`===\` (Strict): No conversion (e.g., \`0 === false\` is false).
+
+## 6. Loops & Switch
+
+**Loops**:
+We have \`while\`, \`do..while\`, and \`for\`. You can control them with \`break\` and \`continue\`.
+
+**Switch**:
+Replaces multiple \`if\` checks. Uses **strict equality** (\`===\`) for comparisons.
+
+\`\`\`javascript
+switch (age) {
+  case 18: /*...*/ break;
+  default: /*...*/
+}
+\`\`\`
+
+## 7. Functions
+
+We have three distinct ways to define functions:
+
+
+
+1.  **Function Declaration**: Hoisted (usable before definition).
+    \`\`\`javascript
+    function sum(a, b) { return a + b; }
+    \`\`\`
+2.  **Function Expression**: Created when execution reaches the line.
+    \`\`\`javascript
+    let sum = function(a, b) { return a + b; };
+    \`\`\`
+3.  **Arrow Function**: Concise syntax, ideal for callbacks.
+    \`\`\`javascript
+    let sum = (a, b) => a + b;
+    let double = n => n * 2;
+    \`\`\`
+`
+},
 
     ]
   },
@@ -602,7 +2468,7 @@ const SidebarContent = ({
       flex flex-col h-full
       bg-white
       border-r border-zinc-200
-
+    
       dark:bg-zinc-950/60
       dark:border-zinc-800
     "
@@ -655,8 +2521,8 @@ const SidebarContent = ({
     </div>
 
     {/* ---------------- CONTENT ---------------- */}
-    <ScrollArea className="flex-1 px-2 sm:px-4 py-4 sm:py-6">
-      <div className="space-y-8">
+    <ScrollArea className="flex-1    px-2 sm:px-4 py-4 sm:py-6">
+      <div className="space-y-8 pb-20 h-140 no-scrollbar sm:h-120 overflow-y-auto ">
         {/* PRIMARY NAV */}
         <nav className="px-1 space-y-1">
           <Link
@@ -837,10 +2703,10 @@ export default function DocumentationPage() {
   };
 
   return (
-    <div className="flex min-h-screen mt-20 w-full scroll-smooth text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
+    <div className="flex   min-h-screen  fixed  pb-20 mt-20 w-full scroll-smooth text-white font-sans overflow-hidden selection:bg-zinc-800 selection:text-white">
       
       {/* DESKTOP SIDEBAR */}
-      <aside className="w-80 border-r border-zinc-300 dark:border-zinc-800 hidden xl:flex z-30">
+      <aside className="w-80  border-r border-zinc-300 dark:border-zinc-800 hidden xl:flex z-30">
         <SidebarContent 
             activeDocId={activeDocId} 
             setActiveDocId={setActiveDocId} 
@@ -971,8 +2837,10 @@ export default function DocumentationPage() {
                         <span className="text-xs text-zinc-500">Last updated today</span>
                     </div>
 
+                    <div className="overflow-y-auto no-scrollbar h-screen pb-60 sm:pb-100">
+
                     {/* CUSTOM MARKDOWN RENDERER WITH ID INJECTION */}
-                    <div data-color-mode={isDark ? "dark" : "light"} className="prose prose-invert max-w-none">
+                    <div data-color-mode={isDark ? "dark" : "light"} className="prose prose-invert  max-w-none">
                         <MDEditor.Markdown 
                             source={activeDoc?.content} 
                              components={{
@@ -1035,6 +2903,7 @@ export default function DocumentationPage() {
                             </Button>
                         )}
                         </div>
+                    </div>
                     </div>
                     </div>
 
