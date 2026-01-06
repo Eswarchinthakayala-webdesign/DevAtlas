@@ -29,26 +29,28 @@ import {
   Zap,
   Layout,
   Globe,
-  X
+  X,
+  Code
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import '../markdown.css'
+import mermaid from "mermaid";
+import JSTMd from "../md/jst.md?raw";
 // ------------------------------------------------------------------
 // 1. UTILITY: SLUGIFY
 // Converts "Core Concepts" -> "core-concepts" for IDs
 // ------------------------------------------------------------------
 const slugify = (text) => {
-  if (!text) return "";
   return text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w\-]+/g, "") // Remove all non-word chars
-    .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
 };
 
-// Helper to extract raw text from React children (for the ID generation)
+// Helper to extract raw text from React children (Fixes the [object Object] error)
 const getNodeText = (node) => {
   if (["string", "number"].includes(typeof node)) return node;
   if (node instanceof Array) return node.map(getNodeText).join("");
@@ -57,167 +59,528 @@ const getNodeText = (node) => {
   return "";
 };
 
+const Mermaid = ({ chart }) => {
+  const { theme } = useTheme?.() ?? { theme: "system" };
+
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const ref = useRef(null);
+  const [svg, setSvg] = useState("");
+
+  useEffect(() => {
+    if (!chart) return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? "dark" : "default",
+      securityLevel: "loose",
+      fontFamily: "ui-sans-serif, system-ui, sans-serif",
+      themeVariables: {
+        background: isDark ? "#000000" : "#ffffff",
+        primaryColor: isDark ? "#27272a" : "#fff",
+        primaryBorderColor: isDark ? "#3f3f46" : "#d4d4d8",
+        primaryTextColor: isDark ? "#ffffff" : "#fff",
+        lineColor: isDark ? "#71717a" : "#a1a1aa",
+      },
+    });
+
+    const renderChart = async () => {
+      try {
+        const id = `mermaid-${Math.random().toString(36).slice(2)}`;
+        const { svg } = await mermaid.render(id, chart);
+        setSvg(svg);
+      } catch (error) {
+        console.error("Mermaid error:", error);
+        setSvg(`
+          <pre class="
+            text-xs p-3 rounded-lg border
+            text-red-600 bg-red-50 border-red-200
+            dark:text-red-400 dark:bg-red-950/30 dark:border-red-900
+          ">
+${error.message}
+          </pre>
+        `);
+      }
+    };
+
+    renderChart();
+  }, [chart, isDark]);
+
+  return (
+    <div
+      ref={ref}
+      className="
+        my-6 flex justify-center overflow-x-auto rounded-xl border p-6
+
+        bg-white border-zinc-200
+        dark:bg-black dark:border-zinc-800
+      "
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
+};
+
 // ------------------------------------------------------------------
 // 2. MOCK DOCUMENTATION DATA
 // ------------------------------------------------------------------
 
 const DOCS_DATA = [
   {
-    category: "Getting Started",
+    category: "Onboarding",
+    items: [
+{
+        id: "intro",
+        title: "About DevAtlas",
+        content: `
+# About DevAtlas
+
+Welcome to **DevAtlas**, my personal engineering portfolio and comprehensive knowledge base.
+
+This platform allows me to bridge the gap between **learning** and **building**. Instead of a static resume, DevAtlas serves as a living documentation of my technical journey, providing a transparent view of my skills and growth.
+
+## What is DevAtlas?
+
+DevAtlas is designed around three core pillars that define my career progression:
+
+1.  **The Curriculum**: A detailed tracker of the courses and technical tracks I have mastered (e.g., React Internals, Native Architecture). It's not just a list; it's a proof of knowledge.
+2.  **The Showcase**: A gallery of the projects I have engineered. This demonstrates how I translate theoretical concepts into production-ready applications.
+3.  **The Profile**: A dynamic dashboard showing my real-time coding activity, GitHub streaks, and contributions.
+
+## Why I Built This
+
+I believe in **Proof of Work**. 
+
+- **Documentation**: I don't just consume content; I document complex concepts to ensure deep understanding.
+- **Application**: I build projects to cement my knowledge of frameworks like React, Next.js, and React Native.
+- **Consistency**: The profile section proves my daily commitment to writing code.
+
+## The Tech Stack
+
+This website itself is an engineering demonstration, built with:
+
+- **Core**: React ecosystem (Vite)
+- **Styling**: Tailwind CSS + Shadcn UI
+- **Language**: JavaScript
+        `
+      }
+    ]
+  },
+  {
+    category: "Javascript",
+    items: [
+
+      {
+  id: "js-1",
+  title: "Introduction",
+  content: `
+
+# An Introduction to JavaScript
+
+Let's see what's so special about JavaScript, what we can achieve with it, and what other technologies play well with it.
+
+## What is JavaScript?
+
+*JavaScript* was initially created to "make web pages alive".
+
+The programs in this language are called *scripts*. They can be written right in a web page's HTML and run automatically as the page loads.
+
+Scripts are provided and executed as plain text. They don't need special preparation or compilation to run.
+
+In this aspect, JavaScript is very different from another language called [Java](https://en.wikipedia.org/wiki/Java_(programming_language)).
+
+
+smart header="Why is it called <u>Java</u>Script?"
+When JavaScript was created, it initially had another name: "LiveScript". But Java was very popular at that time, so it was decided that positioning a new language as a "younger brother" of Java would help.
+
+But as it evolved, JavaScript became a fully independent language with its own specification called [ECMAScript](http://en.wikipedia.org/wiki/ECMAScript), and now it has no relation to Java at all.
+
+
+Today, JavaScript can execute not only in the browser, but also on the server, or actually on any device that has a special program called [the JavaScript engine](https://en.wikipedia.org/wiki/JavaScript_engine).
+
+The browser has an embedded engine sometimes called a "JavaScript virtual machine".
+
+Different engines have different "codenames". For example:
+
+* [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine)) -- in Chrome, Opera and Edge.
+* [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey) -- in Firefox.
+* ...There are other codenames like "Chakra" for IE, "JavaScriptCore", "Nitro" and "SquirrelFish" for Safari, etc.
+
+The terms above are good to remember because they are used in developer articles on the internet. We'll use them too. For instance, if "a feature X is supported by V8", then it probably works in Chrome, Opera and Edge.
+
+
+smart header="How do engines work?"
+
+Engines are complicated. But the basics are easy.
+
+1. The engine (embedded if it's a browser) reads ("parses") the script.
+2. Then it converts ("compiles") the script to machine code.
+3. And then the machine code runs, pretty fast.
+
+The engine applies optimizations at each step of the process. It even watches the compiled script as it runs, analyzes the data that flows through it, and further optimizes the machine code based on that knowledge.
+
+
+## What can in-browser JavaScript do?
+
+Modern JavaScript is a "safe" programming language. It does not provide low-level access to memory or the CPU, because it was initially created for browsers which do not require it.
+
+JavaScript's capabilities greatly depend on the environment it's running in. For instance, [Node.js](https://wikipedia.org/wiki/Node.js) supports functions that allow JavaScript to read/write arbitrary files, perform network requests, etc.
+
+In-browser JavaScript can do everything related to webpage manipulation, interaction with the user, and the webserver.
+
+For instance, in-browser JavaScript is able to:
+
+* Add new HTML to the page, change the existing content, modify styles.
+* React to user actions, run on mouse clicks, pointer movements, key presses.
+* Send requests over the network to remote servers, download and upload files (so-called [AJAX](https://en.wikipedia.org/wiki/Ajax_(programming)) and [COMET](https://en.wikipedia.org/wiki/Comet_(programming)) technologies).
+* Get and set cookies, ask questions to the visitor, show messages.
+* Remember the data on the client-side ("local storage").
+
+## What CAN'T in-browser JavaScript do?
+
+JavaScript's abilities in the browser are limited to protect the user's safety. The aim is to prevent an evil webpage from accessing private information or harming the user's data.
+
+Examples of such restrictions include:
+
+* JavaScript on a webpage may not read/write arbitrary files on the hard disk, copy them or execute programs. It has no direct access to OS functions.
+Modern browsers allow it to work with files, but the access is limited and only provided if the user does certain actions, like "dropping" a file into a browser window or selecting it via an \`<input>\` tag.
+There are ways to interact with the camera/microphone and other devices, but they require a user's explicit permission. So a JavaScript-enabled page may not sneakily enable a web-camera, observe the surroundings and send the information to the [NSA](https://en.wikipedia.org/wiki/National_Security_Agency).
+* Different tabs/windows generally do not know about each other. Sometimes they do, for example when one window uses JavaScript to open the other one. But even in this case, JavaScript from one page may not access the other page if they come from different sites (from a different domain, protocol or port).
+This is called the "Same Origin Policy". To work around that, *both pages* must agree for data exchange and must contain special JavaScript code that handles it. We'll cover that in the tutorial.
+This limitation is, again, for the user's safety. A page from \`http://anysite.com\` which a user has opened must not be able to access another browser tab with the URL \`http://gmail.com\`, for example, and steal information from there.
+* JavaScript can easily communicate over the net to the server where the current page came from. But its ability to receive data from other sites/domains is crippled. Though possible, it requires explicit agreement (expressed in HTTP headers) from the remote side. Once again, that's a safety limitation.
+
+Such limitations do not exist if JavaScript is used outside of the browser, for example on a server. Modern browsers also allow plugins/extensions which may ask for extended permissions.
+
+## What makes JavaScript unique?
+
+There are at least *three* great things about JavaScript:
+
+
+compare
+
+* Full integration with HTML/CSS.
+* Simple things are done simply.
+* Supported by all major browsers and enabled by default.
+
+JavaScript is the only browser technology that combines these three things.
+
+That's what makes JavaScript unique. That's why it's the most widespread tool for creating browser interfaces.
+
+That said, JavaScript can be used to create servers, mobile applications, etc.
+
+## Languages "over" JavaScript
+
+The syntax of JavaScript does not suit everyone's needs. Different people want different features.
+
+That's to be expected, because projects and requirements are different for everyone.
+
+So, recently a plethora of new languages appeared, which are *transpiled* (converted) to JavaScript before they run in the browser.
+
+Modern tools make the transpilation very fast and transparent, actually allowing developers to code in another language and auto-converting it "under the hood".
+
+Examples of such languages:
+
+* [CoffeeScript](https://coffeescript.org/) is "syntactic sugar" for JavaScript. It introduces shorter syntax, allowing us to write clearer and more precise code. Usually, Ruby devs like it.
+* [TypeScript](https://www.typescriptlang.org/) is concentrated on adding "strict data typing" to simplify the development and support of complex systems. It is developed by Microsoft.
+* [Flow](https://flow.org/) also adds data typing, but in a different way. Developed by Facebook.
+* [Dart](https://www.dartlang.org/) is a standalone language that has its own engine that runs in non-browser environments (like mobile apps), but also can be transpiled to JavaScript. Developed by Google.
+* [Brython](https://brython.info/) is a Python transpiler to JavaScript that enables the writing of applications in pure Python without JavaScript.
+* [Kotlin](https://kotlinlang.org/docs/reference/js-overview.html) is a modern, concise and safe programming language that can target the browser or Node.
+
+There are more. Of course, even if we use one of these transpiled languages, we should also know JavaScript to really understand what we're doing.
+
+## Summary
+
+* JavaScript was initially created as a browser-only language, but it is now used in many other environments as well.
+* Today, JavaScript has a unique position as the most widely-adopted browser language, fully integrated with HTML/CSS.
+* There are many languages that get "transpiled" to JavaScript and provide certain features. It is recommended to take a look at them, at least briefly, after mastering JavaScript.
+`
+},
+{
+   id: "js-2",
+  title: "Manuals and specifications",
+  content: `
+  
+# Manuals and specifications
+
+This book is a *tutorial*. It aims to help you gradually learn the language. But once you're familiar with the basics, you'll need other resources.
+
+## Specification
+
+[The ECMA-262 specification](https://www.ecma-international.org/publications/standards/Ecma-262.htm) contains the most in-depth, detailed and formalized information about JavaScript. It defines the language.
+
+But being that formalized, it's difficult to understand at first. So if you need the most trustworthy source of information about the language details, the specification is the right place. But it's not for everyday use.
+
+A new specification version is released every year. Between these releases, the latest specification draft is at <https://tc39.es/ecma262/>.
+
+To read about new bleeding-edge features, including those that are "almost standard" (so-called "stage 3"), see proposals at <https://github.com/tc39/proposals>.
+
+Also, if you're developing for the browser, then there are other specifications covered in the [second part](info:browser-environment) of the tutorial.
+
+## Manuals
+
+- **MDN (Mozilla) JavaScript Reference** is the main manual with examples and other information. It's great to get in-depth information about individual language functions, methods etc.
+
+    You can find it at <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference>.
+
+Although, it's often best to use an internet search instead. Just use "MDN [term]" in the query, e.g. <https://google.com/search?q=MDN+parseInt> to search for the \`parseInt\` function.
+
+## Compatibility tables
+
+JavaScript is a developing language, new features get added regularly.
+
+To see their support among browser-based and other engines, see:
+
+- <https://caniuse.com> - per-feature tables of support, e.g. to see which engines support modern cryptography functions: <https://caniuse.com/#feat=cryptography>.
+- <https://kangax.github.io/compat-table> - a table with language features and engines that support those or don't support.
+
+All these resources are useful in real-life development, as they contain valuable information about language details, their support, etc.
+
+Please remember them (or this page) for the cases when you need in-depth information about a particular feature.`
+},
+{
+   id: "js-3",
+  title: "Code Editors",
+  content: ` 
+  # Code editors
+
+A code editor is the place where programmers spend most of their time.
+
+There are two main types of code editors: IDEs and lightweight editors. Many people use one tool of each type.
+
+## IDE
+
+The term [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment) (Integrated Development Environment) refers to a powerful editor with many features that usually operates on a "whole project." As the name suggests, it's not just an editor, but a full-scale "development environment."
+
+An IDE loads the project (which can be many files), allows navigation between files, provides autocompletion based on the whole project (not just the open file), and integrates with a version management system (like [git](https://git-scm.com/)), a testing environment, and other "project-level" stuff.
+
+If you haven't selected an IDE yet, consider the following options:
+
+- [Visual Studio Code](https://code.visualstudio.com/) (cross-platform, free).
+- [WebStorm](https://www.jetbrains.com/webstorm/) (cross-platform, paid).
+
+For Windows, there's also "Visual Studio", not to be confused with "Visual Studio Code". "Visual Studio" is a paid and mighty Windows-only editor, well-suited for the .NET platform. It's also good at JavaScript. There's also a free version [Visual Studio Community](https://www.visualstudio.com/vs/community/).
+
+Many IDEs are paid, but have a trial period. Their cost is usually negligible compared to a qualified developer's salary, so just choose the best one for you.
+
+## Lightweight editors
+
+"Lightweight editors" are not as powerful as IDEs, but they're fast, elegant and simple.
+
+They are mainly used to open and edit a file instantly.
+
+The main difference between a "lightweight editor" and an "IDE" is that an IDE works on a project-level, so it loads much more data on start, analyzes the project structure if needed and so on. A lightweight editor is much faster if we need only one file.
+
+In practice, lightweight editors may have a lot of plugins including directory-level syntax analyzers and autocompleters, so there's no strict border between a lightweight editor and an IDE.
+
+There are many options, for instance:
+
+- [Sublime Text](https://www.sublimetext.com/) (cross-platform, shareware).
+- [Notepad++](https://notepad-plus-plus.org/) (Windows, free).
+- [Vim](https://www.vim.org/) and [Emacs](https://www.gnu.org/software/emacs/) are also cool if you know how to use them.
+
+## Let's not argue
+
+The editors in the lists above are those that either I or my friends whom I consider good developers have been using for a long time and are happy with.
+
+There are other great editors in our big world. Please choose the one you like the most.
+
+The choice of an editor, like any other tool, is individual and depends on your projects, habits, and personal preferences.
+
+The author's personal opinion:
+
+- I'd use [Visual Studio Code](https://code.visualstudio.com/) if I develop mostly frontend.
+- Otherwise, if it's mostly another language/platform and partially frontend, then consider other editors, such as XCode (Mac), Visual Studio (Windows) or Jetbrains family (Webstorm, PHPStorm, RubyMine etc, depending on the language).`
+},
+{
+  id:"js-4",
+  title:"Developer console",
+  content:`
+  
+# Developer console
+
+Code is prone to errors. You will quite likely make errors... Oh, what am I talking about? You are *absolutely* going to make errors, at least if you're a human, not a [robot](https://en.wikipedia.org/wiki/Bender_(Futurama)).
+
+But in the browser, users don't see errors by default. So, if something goes wrong in the script, we won't see what's broken and can't fix it.
+
+To see errors and get a lot of other useful information about scripts, "developer tools" have been embedded in browsers.
+
+Most developers lean towards Chrome or Firefox for development because those browsers have the best developer tools. Other browsers also provide developer tools, sometimes with special features, but are usually playing "catch-up" to Chrome or Firefox. So most developers have a "favorite" browser and switch to others if a problem is browser-specific.
+
+Developer tools are potent; they have many features. To start, we'll learn how to open them, look at errors, and run JavaScript commands.
+
+## Google Chrome
+
+Open the page [bug.html](bug.html).
+
+There's an error in the JavaScript code on it. It's hidden from a regular visitor's eyes, so let's open developer tools to see it.
+
+Press \`key:F12\` or, if you're on Mac, then \`key:Cmd+Opt+J\`.
+
+The developer tools will open on the Console tab by default.
+
+It looks somewhat like this:
+
+![chrome](/chrome.webp)
+
+The exact look of developer tools depends on your version of Chrome. It changes from time to time but should be similar.
+
+- Here we can see the red-colored error message. In this case, the script contains an unknown "lalala" command.
+- On the right, there is a clickable link to the source \`bug.html:12\` with the line number where the error has occurred.
+
+Below the error message, there is a blue \`>\` symbol. It marks a "command line" where we can type JavaScript commands. Press \`key:Enter\` to run them.
+
+Now we can see errors, and that's enough for a start. We'll come back to developer tools later and cover debugging more in-depth in the chapter <info:debugging-chrome>.
+
+\`\`\`smart header="Multi-line input"
+Usually, when we put a line of code into the console, and then press \`key:Enter\`, it executes.
+
+To insert multiple lines, press \`key:Shift+Enter\`. This way one can enter long fragments of JavaScript code.
+\`\`\`
+
+## Firefox, Edge, and others
+
+Most other browsers use \`key:F12\` to open developer tools.
+
+The look & feel of them is quite similar. Once you know how to use one of these tools (you can start with Chrome), you can easily switch to another.
+
+## Safari
+
+Safari (Mac browser, not supported by Windows/Linux) is a little bit special here. We need to enable the "Develop menu" first.
+
+Open Settings and go to the "Advanced" pane. There's a checkbox at the bottom:
+
+![safari](/safari.png)
+
+Now \`key:Cmd+Opt+C\` can toggle the console. Also, note that the new top menu item named "Develop" has appeared. It has many commands and options.
+
+## Summary
+
+- Developer tools allow us to see errors, run commands, examine variables, and much more.
+- They can be opened with \`key:F12\` for most browsers on Windows. Chrome for Mac needs \`key:Cmd+Opt+J\`, Safari: \`key:Cmd+Opt+C\` (need to enable first).
+
+Now we have the environment ready. In the next section, we'll get down to JavaScript.
+
+  `
+}
+
+    ]
+  },
+  {
+    category: "React Ecosystem",
     items: [
       {
-        id: "intro",
-        title: "Introduction",
+        id: "react-vite",
+        title: "React via Vite",
         content: `
-# DevAtlas Protocol
+# React Runtime: Vite
 
-DevAtlas is a structured learning environment designed to bridge the gap between **theoretical knowledge** and **production engineering**. Unlike traditional courses, DevAtlas functions as an operating system for your learning journey.
+While React is the library, **Vite** is the build tool that serves it. We choose Vite over Create-React-App (CRA) for its Native ESM (ECMAScript Modules) support, offering near-instant server starts.
 
-## Core Philosophy
+## Initialization
 
-1.  **System over Syntax**: We prioritize architectural patterns over syntax memorization.
-2.  **Production Grade**: All modules enforce TypeScript, Accessibility (a11y), and Testing.
-3.  **Non-Linear**: Jump between React internals, Systems Design, and Native mobile development.
-
-## System Requirements
-
-Before initializing the protocol, ensure your environment meets these standards:
-
-- **Node.js**: v18.17.0 or higher
-- **PackageManager**: pnpm (recommended) or npm v9+
-- **Editor**: VS Code with the *DevAtlas Extension Pack*
+Scaffold a new Single Page Application (SPA) using the Vite CLI.
 
 \`\`\`bash
-# Verify your node version
-node -v
-# v20.10.0
+npm create vite@latest my-app -- --template react-ts
+cd my-app
+npm install
+npm run dev
 \`\`\`
+
+## Architecture
+Vite projects distinguish between **Public** assets (served as-is) and **Source** code (compiled).
+
+\`\`\`
+/src
+  /assets      # Imported images/fonts
+  /components  # Atomic UI units
+  App.tsx      # Root Component
+  main.tsx     # DOM Injection Entry Point
+\`\`\`
+        `
+      }
+    ]
+  },
+  {
+    category: "Next.js Framework",
+    items: [
+      {
+        id: "next-intro",
+        title: "Next.js Architecture",
+        content: `
+# Next.js: The React Framework
+
+Next.js handles the configuration needed for production: Hybrid Rendering, Routing, and Optimization.
+
+## App Router Paradigm
+We utilize the modern **App Router** (\`app/\` directory), which leverages React Server Components (RSC). This allows components to render on the server by default, sending zero JavaScript to the client.
+
+## Installation
+
+Initialize a full-stack environment:
+
+\`\`\`bash
+npx create-next-app@latest
+\`\`\`
+
+**Recommended Configuration:**
+- TypeScript: **Yes**
+- ESLint: **Yes**
+- Tailwind CSS: **Yes**
+- \`src/\` directory: **Yes**
+- App Router: **Yes**
+- Import alias (\`@/*\`): **Yes**
         `
       },
       {
-        id: "installation",
-        title: "Installation & Setup",
+        id: "next-ui-stack",
+        title: "UI Engineering (Shadcn + Tailwind)",
         content: `
-# Installation
+# The Modern UI Stack
 
-Initialize your local learning environment using our CLI tool. This will scaffold your personal dashboard and sync your progress with the remote protocol.
+We utilize a "Headless" approach to UI. We do not use component libraries that trap us in their design system (like MUI or Bootstrap). Instead, we own our component code.
 
-## Step 1: The CLI
+## The Stack
+1.  **Tailwind CSS**: Atomic styling engine.
+2.  **Radix UI**: Accessible, headless primitives.
+3.  **Shadcn UI**: Copy/paste component architecture.
 
-Run the initialization command in your terminal:
+## Integration Pipeline
+
+Assuming a fresh Next.js installation with Tailwind CSS configured:
+
+### 1. Initialize Shadcn
+Run the CLI to configure your \`components.json\` and theme variables.
 
 \`\`\`bash
-npx create-devatlas@latest
+npx shadcn-ui@latest init
 \`\`\`
 
-You will be prompted to select your track:
-- \`Core (React + Next.js)\`
-- \`Mobile (React Native + Expo)\`
-- \`Systems (Rust + Wasm)\`
+### 2. Utility Class Merge
+This setup installs a \`cn()\` utility (usually in \`lib/utils.ts\`). This is crucial for merging Tailwind classes dynamically without conflicts.
 
-## Step 2: Configuration
+\`\`\`typescript
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-Create a \`.devatlasrc\` file in your root directory to customize your learning path:
-
-\`\`\`json
-{
-  "theme": "zinc",
-  "modules": ["react-internals", "system-design"],
-  "mode": "strict"
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 \`\`\`
 
-> **Note**: Strict mode enforces test passing before unlocking the next module.
-        `
-      }
-    ]
-  },
-  {
-    category: "Core Concepts",
-    items: [
-      {
-        id: "architecture",
-        title: "Architecture",
-        content: `
-# System Architecture
-
-DevAtlas is built on a **headless content model**. This means the curriculum data is decoupled from the presentation layer, allowing you to consume the learning materials via our web dashboard, CLI, or even a custom VS Code extension.
-
-## The Sync Engine
-
-Your progress is tracked via a local CRDT (Conflict-free Replicated Data Type) store, ensuring that you can learn offline. When you reconnect, your progress syncs with the global ledger.
-
-\`\`\`mermaid
-graph LR
-A[Local State] -- Sync --> B((DevAtlas Cloud))
-B -- Update --> C[Leaderboards]
-\`\`\`
-
-## Module Structure
-
-Each module consists of three distinct phases:
-
-| Phase | Description | Output |
-| :--- | :--- | :--- |
-| **Ingest** | Reading documentation and watching concept videos. | Knowledge Graph |
-| **Apply** | Completing interactive labs and coding challenges. | Git Commit |
-| **Verify** | Automated tests run against your solution. | Pass/Fail |
-        `
-      },
-      {
-        id: "cli-reference",
-        title: "CLI Reference",
-        content: `
-# Command Line Interface
-
-The \`da\` (DevAtlas) command line tool is your primary interface for interacting with the curriculum.
-
-## Common Commands
-
-### \`da sync\`
-Synchronizes your local progress with the cloud.
-
-### \`da submit\`
-Submits the current lab for verification.
+### 3. Adding Components
+Unlike npm packages, you add component source code to your project.
 
 \`\`\`bash
-$ da submit ./labs/module-01
-> Running tests...
-> ✅ Reconciliation tests passed
-> ✅ Fiber architecture tests passed
-> 🚀 Module Completed! +500 XP
+npx shadcn-ui@latest add button
 \`\`\`
 
-### \`da next\`
-Downloads the next lesson in your active track.
-        `
-      }
-    ]
-  },
-  {
-    category: "API Reference",
-    items: [
-      {
-        id: "sdk",
-        title: "DevAtlas SDK",
-        content: `
-# DevAtlas SDK
-
-Build custom tools on top of your learning data using the Node.js SDK.
-
-## Usage
-
-\`\`\`javascript
-import { DevAtlas } from '@devatlas/sdk';
-
-const client = new DevAtlas({
-  apiKey: process.env.DA_KEY
-});
-
-// Fetch your current streak
-const profile = await client.user.getProfile();
-console.log(profile.streak); // 12
-\`\`\`
+This creates \`components/ui/button.tsx\`, which you can fully customize.
         `
       }
     ]
@@ -336,10 +699,11 @@ const SidebarContent = ({
 
                   dark:text-zinc-400
                 "
+
               >
-                {section.category === "Getting Started" && <Zap className="w-3 h-3" />}
-                {section.category === "Core Concepts" && <Cpu className="w-3 h-3" />}
-                {section.category === "API Reference" && <Layers className="w-3 h-3" />}
+                {section.category === "Onboarding" && <Zap className="w-3 h-3" />}
+                {section.category === "Javascript" && <Code className="w-3 text-yellow-400 dark:text-yellow-500 h-3" />}
+                {section.category === "React Ecosystem" && <Layers className="w-3 h-3" />}
                 {section.category}
               </h3>
 
@@ -611,11 +975,18 @@ export default function DocumentationPage() {
                     <div data-color-mode={isDark ? "dark" : "light"} className="prose prose-invert max-w-none">
                         <MDEditor.Markdown 
                             source={activeDoc?.content} 
-                            components={{
-                                // Custom renderers to add IDs to headers
-                                h1: ({ children }) => <h1 id={slugify(getNodeText(children))}>{children}</h1>,
-                                h2: ({ children }) => <h2 id={slugify(getNodeText(children))}>{children}</h2>,
-                                h3: ({ children }) => <h3 id={slugify(getNodeText(children))}>{children}</h3>,
+                             components={{
+                              
+                              // FIX: Extract text from children properly for code blocks
+                              code: ({ inline, children, className, ...props }) => {
+                                const match = /language-(\w+)/.exec(className || "");
+                                const codeContent = getNodeText(children); // Use helper here
+                                
+                                if (!inline && match && match[1] === "mermaid") {
+                                  return <Mermaid chart={codeContent} />;
+                                }
+                                return <code className={className} {...props}>{children}</code>;
+                              }
                             }}
                             style={{ 
                                 backgroundColor: isDark ? "transparent" : "", 

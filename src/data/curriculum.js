@@ -812,6 +812,8 @@ const Item = ({ item }) => {
     id: "track-rn-expo",
     title: "React Native & Expo ",
     icon: Smartphone,
+    level: "Beginner",
+    totalDuration: "4h 30m",
     modules: [
       {
         id: "mod-setup",

@@ -146,7 +146,52 @@ const SHOWCASE_DATA = [
      image: "/project-7.png",
     liveUrl: "https://climetrik.vercel.app/",
     repoUrl: "https://github.com/Eswarchinthakayala-webdesign/Recrutis"
-  }
+  },
+    {
+    id: "proj-8",
+    title: "SparkLab",
+    description: "Experience real-time circuit simulation and interactive visualization. Learn BEEE concepts the smart, modern way.",
+    author: "Eswar Chinthakayala",
+    role: "Full Stack",
+    category: "web",
+    tags: ["React 18", "Tailwind", "Three.js","svg","motion"],
+    stats: { stars: 56, forks: 8 },
+    featured: false,
+    color: "from-blue-500 to-cyan-500",
+    image: "/project-8.png",
+    liveUrl: "https://sparklab-beee.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/SparkLab"
+  },
+    {
+    id: "proj-9",
+    title: "NexEmbed",
+    description: "NexEmbed is a modern, web-native lab for building IoT and embedded projects. Drag components, wire pins, write firmware, and visualize results with virtual instruments — no installs required.",
+    author: "Eswar Chinthakayala",
+    role: "Frontend Dev",
+    category: "web",
+    tags: ["React 18", "motion", "plot3d","three.js","etc"],
+    stats: { stars: 89, forks: 12 },
+    featured: false,
+    color: "from-zinc-500 to-teal-500",
+    image: "/project-9.png",
+    liveUrl: "https://nexembed.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/NexEmbed"
+  },
+    {
+    id: "proj-10",
+    title: "ZifHub",
+    description: "ZifHub is a modern, high-performance GIF discovery platform built with React.js, designed for speed, simplicity, and seamless user experience. It allows users to explore, search, and instantly preview high-quality GIFs through a clean, responsive interface optimized for both light and dark themes.",
+    author: "Eswar Chinthakayala",
+    role: "Full Stack",
+    category: "web",
+    tags: ["React 18", "tailwind", "Node.js","REST API integration"],
+    stats: { stars: 92, forks: 21 },
+    featured: false,
+    color: "from-pink-500 to-rose-500",
+    image: "/project-10.png",
+    liveUrl: "https://zifhub.vercel.app/",
+    repoUrl: "https://github.com/Eswarchinthakayala-webdesign/ZifHub"
+  },
 ];
 
 const FILTERS = [
